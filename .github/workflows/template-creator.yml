@@ -45,6 +45,7 @@ jobs:
         with:
           node-version: 18
           cache: "npm" # Set this to npm, yarn or pnp
+          cache-dependency-path: "template-creator/package-lock.json" # Set this to the path of your package.json or yarn.lock file
 
       - name: Install dependencies (ubuntu only)
         if: startsWith(matrix.os, 'ubuntu-')
