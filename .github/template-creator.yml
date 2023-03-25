@@ -1,3 +1,5 @@
+name: Template Creator CI
+
 on:
   push:
     branches:
