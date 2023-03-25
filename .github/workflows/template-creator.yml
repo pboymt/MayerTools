@@ -25,10 +25,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     if: startsWith(github.repository, 'pboymt')
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Change directory
-        run: cd template-creator
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
