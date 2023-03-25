@@ -13,6 +13,10 @@ on:
       - "template-creator"
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory:  template-creator
+
 jobs:
   build:
     strategy:
