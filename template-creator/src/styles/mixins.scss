@@ -1,0 +1,43 @@
+@mixin border-top {
+    &.border-top {
+        border-top: {
+            width: 1px;
+            color: var(--border-color);
+            style: solid;
+        }
+
+    }
+}
+
+@mixin border-bottom {
+    &.border-bottom {
+        border-bottom: {
+            width: 1px;
+            color: var(--border-color);
+            style: solid;
+        }
+
+    }
+}
+
+@mixin border-left {
+    &.border-left {
+        border-left: {
+            width: 1px;
+            color: var(--border-color);
+            style: solid;
+        }
+
+    }
+}
+
+@mixin border-right {
+    &.border-right {
+        border-right: {
+            width: 1px;
+            color: var(--border-color);
+            style: solid;
+        }
+
+    }
+}

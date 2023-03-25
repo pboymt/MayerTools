@@ -1,0 +1,26 @@
+syntax = "proto3";
+package templates;
+
+message Project {
+    string uuid = 1;
+    string name = 2;
+    enum ScreenRatio {
+        RATIO_FULL = 0;
+        RATIO_1_2 = 1;
+        RATIO_3_4 = 2;
+        RATIO_9_16 = 3;
+    }
+    ScreenRatio ratio = 3;
+    int32 screenWidth = 4;
+    int32 screenHeight = 5;
+    message Rect {
+        string uuid = 1;
+        string name = 2;
+        int32 x = 3;
+        int32 y = 4;
+        int32 width = 5;
+        int32 height = 6;
+    }
+    repeated Rect rects = 6;
+    string dataURL = 7;
+}
