@@ -79,7 +79,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "",
+      "copyright": "© 2023 Mayer. All rights reserved.",
       "deb": {
         "depends": []
       },
@@ -106,11 +106,16 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "wix": {
+          "language": [
+            "zh-CN"
+          ]
+        }
       }
     },
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
+      "csp": "default-src 'self'; img-src * data: asset: https://asset.localhost"
     },
     "updater": {
       "active": false
