@@ -1,23 +1,23 @@
 <template>
     <div class="rect-item">
         <div class="radio">
-            <span v-if="props.rect.uuid === props.selected" class="material-symbols-outlined rotate-90">
+            <span v-if="roi.uuid === selected" class="material-symbols-outlined rotate-90">
                 radio_button_checked </span>
             <span v-else class="material-symbols-outlined rotate-90"> radio_button_unchecked </span>
         </div>
-        <!-- <div class="value">{{ rect.uuid.slice(-8) }}</div> -->
-        <div class="value">{{ rect.x }}</div>
-        <div class="value">{{ rect.y }}</div>
-        <div class="value">{{ rect.width }}</div>
-        <div class="value">{{ rect.height }}</div>
+        <div class="value">{{ roi.name }}</div>
+        <!-- <div class="value">{{ roi.x }}</div>
+        <div class="value">{{ roi.y }}</div>
+        <div class="value">{{ roi.width }}</div>
+        <div class="value">{{ roi.height }}</div> -->
     </div>
 </template>
 
 <script setup lang="ts">
-import { Rect } from '@/dtos/Rect';
+import { Rect, RegionOfInterest } from '@/dtos/ROI';
 
 interface Props {
-    rect: Rect;
+    roi: RegionOfInterest;
     selected: string;
 }
 
@@ -30,8 +30,8 @@ const props = defineProps<Props>();
 div.rect-item {
     display: flex;
     flex-direction: row;
-    height: 3rem;
-    line-height: 3rem;
+    height: 2rem;
+    line-height: 2rem;
     cursor: pointer;
 
     &:hover {
@@ -57,14 +57,17 @@ div.rect-item {
         align-items: center;
         justify-content: center;
 
-        input[type="radio"] {
-            margin: 0;
+        span {
+            font-size: 1rem;
         }
     }
 
     div.value {
-        flex: 1 0 3rem;
+        flex: 1 0 2rem;
         text-align: center;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 }
 </style>

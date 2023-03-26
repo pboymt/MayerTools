@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { open, OpenDialogOptions, save, SaveDialogOptions } from "@tauri-apps/api/dialog";
+import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
 import { ref } from "vue";
 import Panel from "./components/Panel.vue";
 import Sidebar from "./components/Sidebar.vue";
@@ -8,115 +10,32 @@ import RatioSelector from "./components/sidebar/RatioSelector.vue";
 import RectList from "./components/sidebar/RectList.vue";
 import Toolbar from "./components/sidebar/Toolbar.vue";
 import { Project } from "./dtos/Project";
-import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
-import { save, SaveDialogOptions, open, OpenDialogOptions } from "@tauri-apps/api/dialog";
 import { setTitle } from "./funcs/title";
 
 const project = ref<Project>();
+const camera = ref<'ROI' | 'Rect'>('ROI');
 
-function addRect() {
-  project.value?.addRect();
-}
+function addROI() { project.value?.addROI(); }
+function clearROIs() { project.value?.clearROIs(); }
+function removeROI() { project.value?.removeROI(); }
+function roiGoLeft() { project.value?.moveRoiX(-1); }
+function roiGoRight() { project.value?.moveRoiX(1); }
+function roiGoUp() { project.value?.moveRoiY(-1); }
+function roiGoDown() { project.value?.moveRoiY(1); }
+function roiWidthExpand() { project.value?.changeRoiWidth(1); }
+function roiHeightExpand() { project.value?.changeRoiHeight(1); }
+function roiWidthShrink() { project.value?.changeRoiWidth(-1); }
+function roiHeightShrink() { project.value?.changeRoiHeight(-1); }
+function rectGoLeft() { project.value?.selectedROI?.moveRectX(-1); }
+function rectGoRight() { project.value?.selectedROI?.moveRectX(1); }
+function rectGoUp() { project.value?.selectedROI?.moveRectY(-1); }
+function rectGoDown() { project.value?.selectedROI?.moveRectY(1); }
+function rectWidthExpand() { project.value?.selectedROI?.changeRectWidth(1); }
+function rectHeightExpand() { project.value?.selectedROI?.changeRectHeight(1); }
+function rectWidthShrink() { project.value?.selectedROI?.changeRectWidth(-1); }
+function rectHeightShrink() { project.value?.selectedROI?.changeRectHeight(-1); }
 
-function clearRects() {
-  project.value?.clearRects();
-}
-
-function removeRect() {
-  project.value?.removeRect();
-}
-
-function rectGoLeft() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  if (rect.x - 1 >= 0) {
-    rect.x -= 1;
-  } else {
-    rect.x = 0;
-  }
-}
-
-function rectGoRight() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  const safeArea = project.value.safeArea;
-  if (rect.x + rect.width + 1 <= safeArea.width) {
-    rect.x += 1;
-  } else {
-    rect.x = safeArea.width - rect.width;
-  }
-}
-
-function rectGoUp() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  if (rect.y - 1 >= 0) {
-    rect.y -= 1;
-  } else {
-    rect.y = 0;
-  }
-}
-
-function rectGoDown() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  const safeArea = project.value.safeArea;
-  if (rect.y + rect.height + 1 <= safeArea.height) {
-    rect.y += 1;
-  } else {
-    rect.y = safeArea.height - rect.height;
-  }
-}
-
-function rectWidthExpand() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  const safeArea = project.value.safeArea;
-  if (rect.x + rect.width + 1 <= safeArea.width) {
-    rect.width += 1;
-  } else {
-    rect.width = safeArea.width - rect.x;
-  }
-}
-
-function rectHeightExpand() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  const safeArea = project.value.safeArea;
-  if (rect.y + rect.height + 1 <= safeArea.height) {
-    rect.height += 1;
-  } else {
-    rect.height = safeArea.height - rect.y;
-  }
-}
-
-function rectWidthShrink() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  if (rect.width - 1 >= 0) {
-    rect.width -= 1;
-  } else {
-    rect.width = 1;
-  }
-}
-
-function rectHeightShrink() {
-  if (!project.value) return;
-  const rect = project.value.selectedRect;
-  if (!rect) return;
-  if (rect.height - 1 >= 0) {
-    rect.height -= 1;
-  } else {
-    rect.height = 1;
-  }
-}
+function switchCamera() { camera.value = camera.value === 'ROI' ? 'Rect' : 'ROI'; }
 
 async function createNewProject($event: string) {
   const newProject = new Project($event);
@@ -177,15 +96,18 @@ async function loadProject() {
   <div class="container">
     <Sidebar>
       <template #top>
-        <Toolbar @add="addRect" @remove="removeRect" @clear="clearRects" @left="rectGoLeft" @right="rectGoRight"
-          @up="rectGoUp" @down="rectGoDown" @width-expand="rectWidthExpand" @width-shrink="rectWidthShrink"
-          @height-expand="rectHeightExpand" @height-shrink="rectHeightShrink" />
-        <RectList :rects="project?.rects" :selected="project?.selectedRectId"
-          @select="$event => project && (project.selectedRectId = $event)" />
+        <Toolbar @add="addROI" @remove="removeROI" @clear="clearROIs" @roi-left="roiGoLeft" @roi-right="roiGoRight"
+          @roi-up="roiGoUp" @roi-down="roiGoDown" @roi-width-expand="roiWidthExpand" @roi-width-shrink="roiWidthShrink"
+          @roi-height-expand="roiHeightExpand" @roi-height-shrink="roiHeightShrink" @rect-left="rectGoLeft"
+          @rect-right="rectGoRight" @rect-up="rectGoUp" @rect-down="rectGoDown" @rect-width-expand="rectWidthExpand"
+          @rect-width-shrink="rectWidthShrink" @rect-height-expand="rectHeightExpand"
+          @rect-height-shrink="rectHeightShrink" :camera="camera" @switch="switchCamera" />
+        <RectList :rois="project?.rois" :selected="project?.selectedRoiId"
+          @select="$event => project && (project.selectedRoiId = $event)" />
       </template>
       <template #bottom>
-        <Preview v-if="project" :project="project" />
-        <RatioSelector v-if="project" v-model="project.ratio" />
+        <RatioSelector :project="project" />
+        <Preview :project="project" />
         <!-- <input class="border-top" type="text" readonly v-model="filename"> -->
         <FileSelector @change="createNewProject" @save="saveProject" @load="loadProject" />
       </template>

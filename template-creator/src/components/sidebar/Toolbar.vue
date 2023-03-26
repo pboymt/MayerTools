@@ -1,84 +1,95 @@
 <template>
     <div class="toolbar">
-        <button class="toolbar-button" @click="emit('add')">
-            <span class="material-symbols-outlined"> add </span>
-        </button>
-        <button class="toolbar-button" @click="emit('remove')">
-            <span class="material-symbols-outlined"> remove </span>
-        </button>
-        <button class="toolbar-button" @click="emit('clear')">
-            <span class="material-symbols-outlined"> clear_all </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('left')" @mouseup="mouseUp('left')" title="左移">
-            <span class="material-symbols-outlined">
-                keyboard_arrow_left
-            </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('right')" @mouseup="mouseUp('right')" title="右移">
-            <span class="material-symbols-outlined">
-                keyboard_arrow_right
-            </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('up')" @mouseup="mouseUp('up')" title="上移">
-            <span class="material-symbols-outlined">
-                keyboard_arrow_up
-            </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('down')" @mouseup="mouseUp('down')" title="下移">
-            <span class="material-symbols-outlined">
-                keyboard_arrow_down
-            </span>
-        </button>
+        <div class="toolbar-label">
+            操作
+        </div>
+        <ToolbarButton icon="add" @click="emit('add')" title="添加 ROI" />
+        <ToolbarButton icon="remove" @click="emit('remove')" title="移除选中的 ROI" />
+        <ToolbarButton icon="clear_all" @click="emit('clear')" title="清除所有的 ROI" />
+        <ToolbarButton icon="chip_extraction" disabled title="导出" />
+        <ToolbarButton icon="edit" disabled title="重命名项目" />
+        <ToolbarButton icon="edit_note" disabled title="重命名选中的 ROI" />
+        <ToolbarButton icon="tune" disabled title="设置" />
+        <ToolbarButton icon="cameraswitch" @click="emit('switch')" title="切换 ROI 和 Rect" />
     </div>
     <div class="toolbar">
-        <button class="toolbar-button" disabled title="导出">
-            <span class="material-symbols-outlined">
-                chip_extraction
-            </span>
-        </button>
-        <button class="toolbar-button" disabled title="重命名项目">
-            <span class="material-symbols-outlined">
-                edit
-            </span>
-        </button>
-        <button class="toolbar-button" disabled title="重命名模板">
-            <span class="material-symbols-outlined">
-                edit_note
-            </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('width-expand')" @mouseup="mouseUp('width-expand')"
-            @wheel="onWheel($event, false)" title="加宽">
-            <span class="material-symbols-outlined rotate-90"> unfold_more </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('width-shrink')" @mouseup="mouseUp('width-shrink')"
-            @wheel="onWheel($event, false)" title="收窄">
-            <span class="material-symbols-outlined rotate-90"> unfold_less </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('height-expand')" @mouseup="mouseUp('height-expand')"
-            @wheel="onWheel($event, true)" title="增高">
-            <span class="material-symbols-outlined"> unfold_more </span>
-        </button>
-        <button class="toolbar-button" @mousedown="mouseDown('height-shrink')" @mouseup="mouseUp('height-shrink')"
-            @wheel="onWheel($event, true)" title="变低">
-            <span class="material-symbols-outlined"> unfold_less </span>
-        </button>
+        <div class="toolbar-label" :class="{ camera: camera === 'ROI' }">
+            区域
+        </div>
+        <ToolbarButton icon="keyboard_arrow_left" @mousedown="mouseDown('roi-left')" @mouseup="mouseUp('roi-left')"
+            title="左移" />
+        <ToolbarButton icon="keyboard_arrow_right" @mousedown="mouseDown('roi-right')" @mouseup="mouseUp('roi-right')"
+            title="右移" />
+        <ToolbarButton icon="keyboard_arrow_up" @mousedown="mouseDown('roi-up')" @mouseup="mouseUp('roi-up')" title="上移" />
+        <ToolbarButton icon="keyboard_arrow_down" @mousedown="mouseDown('roi-down')" @mouseup="mouseUp('roi-down')"
+            title="下移" />
+        <ToolbarButton icon="unfold_more" rotate @mousedown="mouseDown('roi-width-expand')"
+            @mouseup="mouseUp('roi-width-expand')" @wheel="onWheel($event, false)" title="加宽" />
+        <ToolbarButton icon="unfold_less" rotate @mousedown="mouseDown('roi-width-shrink')"
+            @mouseup="mouseUp('roi-width-shrink')" @wheel="onWheel($event, false)" title="收窄" />
+        <ToolbarButton icon="unfold_more" @mousedown="mouseDown('roi-height-expand')"
+            @mouseup="mouseUp('roi-height-expand')" @wheel="onWheel($event, true)" title="增高" />
+        <ToolbarButton icon="unfold_less" @mousedown="mouseDown('roi-height-shrink')"
+            @mouseup="mouseUp('roi-height-shrink')" @wheel="onWheel($event, true)" title="变低" />
+    </div>
+    <div class="toolbar">
+        <div class="toolbar-label" :class="{ camera: camera === 'Rect' }">
+            模板
+        </div>
+        <ToolbarButton icon="keyboard_arrow_left" @mousedown="mouseDown('rect-left')" @mouseup="mouseUp('rect-left')"
+            title="左移" />
+        <ToolbarButton icon="keyboard_arrow_right" @mousedown="mouseDown('rect-right')" @mouseup="mouseUp('rect-right')"
+            title="右移" />
+        <ToolbarButton icon="keyboard_arrow_up" @mousedown="mouseDown('rect-up')" @mouseup="mouseUp('rect-up')"
+            title="上移" />
+        <ToolbarButton icon="keyboard_arrow_down" @mousedown="mouseDown('rect-down')" @mouseup="mouseUp('rect-down')"
+            title="下移" />
+        <ToolbarButton icon="unfold_more" rotate @mousedown="mouseDown('rect-width-expand')"
+            @mouseup="mouseUp('rect-width-expand')" @wheel="onWheel($event, false)" title="加宽" />
+        <ToolbarButton icon="unfold_less" rotate @mousedown="mouseDown('rect-width-shrink')"
+            @mouseup="mouseUp('rect-width-shrink')" @wheel="onWheel($event, false)" title="收窄" />
+        <ToolbarButton icon="unfold_more" @mousedown="mouseDown('rect-height-expand')"
+            @mouseup="mouseUp('rect-height-expand')" @wheel="onWheel($event, true)" title="增高" />
+        <ToolbarButton icon="unfold_less" @mousedown="mouseDown('rect-height-shrink')"
+            @mouseup="mouseUp('rect-height-shrink')" @wheel="onWheel($event, true)" title="变低" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue';
+import ToolbarButton from './toolbar/ToolbarButton.vue';
 
-const emit = defineEmits(['add', 'remove', 'clear', 'left', 'right', 'up', 'down', 'width-expand', 'width-shrink', 'height-expand', 'height-shrink'])
+interface Props {
+    camera: 'Rect' | 'ROI';
+}
+
+const emit = defineEmits(['add', 'remove', 'clear', 'switch',
+    'roi-left', 'roi-right', 'roi-up', 'roi-down', 'roi-width-expand', 'roi-width-shrink', 'roi-height-expand', 'roi-height-shrink',
+    'rect-left', 'rect-right', 'rect-up', 'rect-down', 'rect-width-expand', 'rect-width-shrink', 'rect-height-expand', 'rect-height-shrink'
+]);
+const props = withDefaults(defineProps<Props>(), {
+    camera: 'ROI',
+});
 
 const mouseActive = {
-    left: false,
-    right: false,
-    up: false,
-    down: false,
-    'width-expand': false,
-    'width-shrink': false,
-    'height-expand': false,
-    'height-shrink': false
+    // ROI
+    'roi-left': false,
+    'roi-right': false,
+    'roi-up': false,
+    'roi-down': false,
+    'roi-width-expand': false,
+    'roi-width-shrink': false,
+    'roi-height-expand': false,
+    'roi-height-shrink': false,
+    // Rect
+    'rect-left': false,
+    'rect-right': false,
+    'rect-up': false,
+    'rect-down': false,
+    'rect-width-expand': false,
+    'rect-width-shrink': false,
+    'rect-height-expand': false,
+    'rect-height-shrink': false,
 }
 let timeout = 0;
 // When the mouse is pressed, an event is triggered. After waiting for 500 ms, if the mouse button is not raised, the event is continuously triggered at 50 ms intervals.
@@ -113,19 +124,19 @@ function mouseUp(event: keyof typeof mouseActive) {
 function keyDown($event: KeyboardEvent) {
     if ($event.repeat) return;
     const key = $event.key;
-    console.log(key);
+    // console.log(key);
     switch (true) {
         case ['a', 'A', 'ArrowLeft'].includes(key):
-            mouseDown('left');
+            mouseDown(props.camera === 'Rect' ? 'rect-left' : 'roi-left');
             break;
         case ['d', 'D', 'ArrowRight'].includes(key):
-            mouseDown('right');
+            mouseDown(props.camera === 'Rect' ? 'rect-right' : 'roi-right');
             break;
         case ['w', 'W', 'ArrowUp'].includes(key):
-            mouseDown('up');
+            mouseDown(props.camera === 'Rect' ? 'rect-up' : 'roi-up');
             break;
         case ['s', 'S', 'ArrowDown'].includes(key):
-            mouseDown('down');
+            mouseDown(props.camera === 'Rect' ? 'rect-down' : 'roi-down');
             break;
     }
 }
@@ -134,16 +145,16 @@ function keyUp($event: KeyboardEvent) {
     const key = $event.key;
     switch (true) {
         case ['a', 'A'].includes(key):
-            mouseUp('left');
+            props.camera === 'ROI' ? mouseUp('roi-left') : mouseUp('rect-left');
             break;
         case ['d', 'D'].includes(key):
-            mouseUp('right');
+            props.camera === 'ROI' ? mouseUp('roi-right') : mouseUp('rect-right');
             break;
         case ['w', 'W'].includes(key):
-            mouseUp('up');
+            props.camera === 'ROI' ? mouseUp('roi-up') : mouseUp('rect-up');
             break;
         case ['s', 'S'].includes(key):
-            mouseUp('down');
+            props.camera === 'ROI' ? mouseUp('roi-down') : mouseUp('rect-down');
             break;
     }
 }
@@ -151,15 +162,15 @@ function keyUp($event: KeyboardEvent) {
 function onWheel($event: WheelEvent, height = false) {
     if (height) {
         if ($event.deltaY > 0) {
-            emit('height-shrink');
+            emit('roi-height-shrink');
         } else {
-            emit('height-expand');
+            emit('roi-height-expand');
         }
     } else {
         if ($event.deltaY > 0) {
-            emit('width-shrink');
+            emit('roi-width-shrink');
         } else {
-            emit('width-expand');
+            emit('roi-width-expand');
         }
     }
 
@@ -178,13 +189,14 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 div.toolbar {
-    height: 3rem;
+    height: 2rem;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     flex-grow: 0;
     flex-shrink: 0;
+    user-select: none;
 
     border: {
         bottom: {
@@ -194,7 +206,7 @@ div.toolbar {
         }
     }
 
-    button.toolbar-button {
+    div.toolbar-label {
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -204,11 +216,11 @@ div.toolbar {
         height: 100%;
         min-width: initial;
         width: auto;
-        aspect-ratio: 1/1;
+        aspect-ratio: 2/1;
         font-size: 1rem;
 
-        span.material-symbols-outlined.rotate-90 {
-            transform: rotate(90deg);
+        &.camera {
+            color: var(--secondary-color-focus);
         }
     }
 }

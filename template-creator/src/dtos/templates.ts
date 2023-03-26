@@ -36,18 +36,22 @@ export interface Project {
      */
     screenHeight: number;
     /**
-     * @generated from protobuf field: repeated templates.Project.Rect rects = 6;
+     * @generated from protobuf field: repeated templates.Project.RegionOfInterest rois = 6;
      */
-    rects: Project_Rect[];
+    rois: Project_RegionOfInterest[];
     /**
      * @generated from protobuf field: string dataURL = 7;
      */
     dataURL: string;
+    /**
+     * @generated from protobuf field: int32 version = 8;
+     */
+    version: number;
 }
 /**
- * @generated from protobuf message templates.Project.Rect
+ * @generated from protobuf message templates.Project.RegionOfInterest
  */
-export interface Project_Rect {
+export interface Project_RegionOfInterest {
     /**
      * @generated from protobuf field: string uuid = 1;
      */
@@ -72,6 +76,80 @@ export interface Project_Rect {
      * @generated from protobuf field: int32 height = 6;
      */
     height: number;
+    /**
+     * @generated from protobuf field: templates.Project.RegionOfInterest.Anchor anchor = 7;
+     */
+    anchor: Project_RegionOfInterest_Anchor;
+    /**
+     * @generated from protobuf field: templates.Project.RegionOfInterest.Rect rect = 8;
+     */
+    rect?: Project_RegionOfInterest_Rect;
+}
+/**
+ * @generated from protobuf message templates.Project.RegionOfInterest.Rect
+ */
+export interface Project_RegionOfInterest_Rect {
+    /**
+     * @generated from protobuf field: string uuid = 1;
+     */
+    uuid: string;
+    /**
+     * @generated from protobuf field: int32 x = 3;
+     */
+    x: number;
+    /**
+     * @generated from protobuf field: int32 y = 4;
+     */
+    y: number;
+    /**
+     * @generated from protobuf field: int32 width = 5;
+     */
+    width: number;
+    /**
+     * @generated from protobuf field: int32 height = 6;
+     */
+    height: number;
+}
+/**
+ * @generated from protobuf enum templates.Project.RegionOfInterest.Anchor
+ */
+export enum Project_RegionOfInterest_Anchor {
+    /**
+     * @generated from protobuf enum value: CENTER = 0;
+     */
+    CENTER = 0,
+    /**
+     * @generated from protobuf enum value: TOP_LEFT = 1;
+     */
+    TOP_LEFT = 1,
+    /**
+     * @generated from protobuf enum value: TOP_RIGHT = 2;
+     */
+    TOP_RIGHT = 2,
+    /**
+     * @generated from protobuf enum value: BOTTOM_LEFT = 3;
+     */
+    BOTTOM_LEFT = 3,
+    /**
+     * @generated from protobuf enum value: BOTTOM_RIGHT = 4;
+     */
+    BOTTOM_RIGHT = 4,
+    /**
+     * @generated from protobuf enum value: CENTER_LEFT = 5;
+     */
+    CENTER_LEFT = 5,
+    /**
+     * @generated from protobuf enum value: CENTER_RIGHT = 6;
+     */
+    CENTER_RIGHT = 6,
+    /**
+     * @generated from protobuf enum value: CENTER_TOP = 7;
+     */
+    CENTER_TOP = 7,
+    /**
+     * @generated from protobuf enum value: CENTER_BOTTOM = 8;
+     */
+    CENTER_BOTTOM = 8
 }
 /**
  * @generated from protobuf enum templates.Project.ScreenRatio
@@ -103,12 +181,13 @@ class Project$Type extends MessageType<Project> {
             { no: 3, name: "ratio", kind: "enum", T: () => ["templates.Project.ScreenRatio", Project_ScreenRatio] },
             { no: 4, name: "screenWidth", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "screenHeight", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "rects", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Project_Rect },
-            { no: 7, name: "dataURL", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 6, name: "rois", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Project_RegionOfInterest },
+            { no: 7, name: "dataURL", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 8, name: "version", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value?: PartialMessage<Project>): Project {
-        const message = { uuid: "", name: "", ratio: 0, screenWidth: 0, screenHeight: 0, rects: [], dataURL: "" };
+        const message = { uuid: "", name: "", ratio: 0, screenWidth: 0, screenHeight: 0, rois: [], dataURL: "", version: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial<Project>(this, message, value);
@@ -134,11 +213,14 @@ class Project$Type extends MessageType<Project> {
                 case /* int32 screenHeight */ 5:
                     message.screenHeight = reader.int32();
                     break;
-                case /* repeated templates.Project.Rect rects */ 6:
-                    message.rects.push(Project_Rect.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated templates.Project.RegionOfInterest rois */ 6:
+                    message.rois.push(Project_RegionOfInterest.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* string dataURL */ 7:
                     message.dataURL = reader.string();
+                    break;
+                case /* int32 version */ 8:
+                    message.version = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -167,12 +249,15 @@ class Project$Type extends MessageType<Project> {
         /* int32 screenHeight = 5; */
         if (message.screenHeight !== 0)
             writer.tag(5, WireType.Varint).int32(message.screenHeight);
-        /* repeated templates.Project.Rect rects = 6; */
-        for (let i = 0; i < message.rects.length; i++)
-            Project_Rect.internalBinaryWrite(message.rects[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* repeated templates.Project.RegionOfInterest rois = 6; */
+        for (let i = 0; i < message.rois.length; i++)
+            Project_RegionOfInterest.internalBinaryWrite(message.rois[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
         /* string dataURL = 7; */
         if (message.dataURL !== "")
             writer.tag(7, WireType.LengthDelimited).string(message.dataURL);
+        /* int32 version = 8; */
+        if (message.version !== 0)
+            writer.tag(8, WireType.Varint).int32(message.version);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -184,25 +269,27 @@ class Project$Type extends MessageType<Project> {
  */
 export const Project = new Project$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class Project_Rect$Type extends MessageType<Project_Rect> {
+class Project_RegionOfInterest$Type extends MessageType<Project_RegionOfInterest> {
     constructor() {
-        super("templates.Project.Rect", [
+        super("templates.Project.RegionOfInterest", [
             { no: 1, name: "uuid", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "x", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "y", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "width", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "height", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 6, name: "height", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "anchor", kind: "enum", T: () => ["templates.Project.RegionOfInterest.Anchor", Project_RegionOfInterest_Anchor] },
+            { no: 8, name: "rect", kind: "message", T: () => Project_RegionOfInterest_Rect }
         ]);
     }
-    create(value?: PartialMessage<Project_Rect>): Project_Rect {
-        const message = { uuid: "", name: "", x: 0, y: 0, width: 0, height: 0 };
+    create(value?: PartialMessage<Project_RegionOfInterest>): Project_RegionOfInterest {
+        const message = { uuid: "", name: "", x: 0, y: 0, width: 0, height: 0, anchor: 0 };
         globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
-            reflectionMergePartial<Project_Rect>(this, message, value);
+            reflectionMergePartial<Project_RegionOfInterest>(this, message, value);
         return message;
     }
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Project_Rect): Project_Rect {
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Project_RegionOfInterest): Project_RegionOfInterest {
         let message = target ?? this.create(), end = reader.pos + length;
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
@@ -212,6 +299,96 @@ class Project_Rect$Type extends MessageType<Project_Rect> {
                     break;
                 case /* string name */ 2:
                     message.name = reader.string();
+                    break;
+                case /* int32 x */ 3:
+                    message.x = reader.int32();
+                    break;
+                case /* int32 y */ 4:
+                    message.y = reader.int32();
+                    break;
+                case /* int32 width */ 5:
+                    message.width = reader.int32();
+                    break;
+                case /* int32 height */ 6:
+                    message.height = reader.int32();
+                    break;
+                case /* templates.Project.RegionOfInterest.Anchor anchor */ 7:
+                    message.anchor = reader.int32();
+                    break;
+                case /* templates.Project.RegionOfInterest.Rect rect */ 8:
+                    message.rect = Project_RegionOfInterest_Rect.internalBinaryRead(reader, reader.uint32(), options, message.rect);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: Project_RegionOfInterest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* string uuid = 1; */
+        if (message.uuid !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.uuid);
+        /* string name = 2; */
+        if (message.name !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* int32 x = 3; */
+        if (message.x !== 0)
+            writer.tag(3, WireType.Varint).int32(message.x);
+        /* int32 y = 4; */
+        if (message.y !== 0)
+            writer.tag(4, WireType.Varint).int32(message.y);
+        /* int32 width = 5; */
+        if (message.width !== 0)
+            writer.tag(5, WireType.Varint).int32(message.width);
+        /* int32 height = 6; */
+        if (message.height !== 0)
+            writer.tag(6, WireType.Varint).int32(message.height);
+        /* templates.Project.RegionOfInterest.Anchor anchor = 7; */
+        if (message.anchor !== 0)
+            writer.tag(7, WireType.Varint).int32(message.anchor);
+        /* templates.Project.RegionOfInterest.Rect rect = 8; */
+        if (message.rect)
+            Project_RegionOfInterest_Rect.internalBinaryWrite(message.rect, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message templates.Project.RegionOfInterest
+ */
+export const Project_RegionOfInterest = new Project_RegionOfInterest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Project_RegionOfInterest_Rect$Type extends MessageType<Project_RegionOfInterest_Rect> {
+    constructor() {
+        super("templates.Project.RegionOfInterest.Rect", [
+            { no: 1, name: "uuid", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "x", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "y", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "width", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "height", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value?: PartialMessage<Project_RegionOfInterest_Rect>): Project_RegionOfInterest_Rect {
+        const message = { uuid: "", x: 0, y: 0, width: 0, height: 0 };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<Project_RegionOfInterest_Rect>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Project_RegionOfInterest_Rect): Project_RegionOfInterest_Rect {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string uuid */ 1:
+                    message.uuid = reader.string();
                     break;
                 case /* int32 x */ 3:
                     message.x = reader.int32();
@@ -236,13 +413,10 @@ class Project_Rect$Type extends MessageType<Project_Rect> {
         }
         return message;
     }
-    internalBinaryWrite(message: Project_Rect, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+    internalBinaryWrite(message: Project_RegionOfInterest_Rect, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
         /* string uuid = 1; */
         if (message.uuid !== "")
             writer.tag(1, WireType.LengthDelimited).string(message.uuid);
-        /* string name = 2; */
-        if (message.name !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.name);
         /* int32 x = 3; */
         if (message.x !== 0)
             writer.tag(3, WireType.Varint).int32(message.x);
@@ -262,6 +436,6 @@ class Project_Rect$Type extends MessageType<Project_Rect> {
     }
 }
 /**
- * @generated MessageType for protobuf message templates.Project.Rect
+ * @generated MessageType for protobuf message templates.Project.RegionOfInterest.Rect
  */
-export const Project_Rect = new Project_Rect$Type();
+export const Project_RegionOfInterest_Rect = new Project_RegionOfInterest_Rect$Type();

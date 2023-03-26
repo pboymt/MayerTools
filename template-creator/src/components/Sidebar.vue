@@ -23,7 +23,7 @@ div.sidebar {
     align-items: stretch;
     background-color: var(--background-color);
     color: var(--foreground-color);
-    width: 21rem;
+    width: 20rem;
     overflow: hidden;
 
     border: {
@@ -51,6 +51,7 @@ div.sidebar {
 
         &-bottom {
             @include menu;
+            flex-grow: 0;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;

@@ -1,8 +1,8 @@
 <template>
     <div class="rect-list">
-        <template v-if="props.rects">
-            <RectItem v-for="rect in props.rects.values()" :key="rect.uuid" :rect="rect" :selected="props.selected!"
-                @click="emit('select', rect.uuid)" />
+        <template v-if="rois">
+            <RectItem v-for="roi in rois.values()" :key="roi.uuid" :roi="roi" :selected="selected!"
+                @click="emit('select', roi.uuid)" />
         </template>
         <template v-else>
             <div class="nothing-alert">
@@ -13,10 +13,10 @@
 </template>
 
 <script setup lang="ts">
-import { Rect, Rects } from '@/dtos/Rect';
+import { Rect, ROIs } from '@/dtos/ROI';
 import RectItem from './RectItem.vue';
 interface Props {
-    rects?: Rects;
+    rois?: ROIs;
     selected?: string;
 }
 
