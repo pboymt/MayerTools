@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "Mayer Template Creator",
-    "version": "0.0.0"
+    "version": "0.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -74,6 +74,9 @@
         "startDragging": false,
         "unmaximize": false,
         "unminimize": false
+      },
+      "notification": {
+        "all": true
       }
     },
     "bundle": {
