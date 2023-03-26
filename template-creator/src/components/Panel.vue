@@ -68,7 +68,7 @@ async function drawImageToCanvas(project: Project) {
 function refreshCanvas() {
     if (mCtx && props.project.image) {
         // mCtx.drawImage(props.project.image, 0, 0);
-        mCtx.clearRect(0, 0, rBgCanvasElement.value!.width, rBgCanvasElement.value!.height);
+        mCtx.clearRect(0, 0, props.project.image!.width, props.project.image!.height);
         drawSafeArea();
         drawSelectedRoiBorder();
         drawROIsRect();

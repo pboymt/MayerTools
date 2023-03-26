@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { open, OpenDialogOptions, save, SaveDialogOptions } from "@tauri-apps/api/dialog";
 import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import Panel from "./components/Panel.vue";
 import Sidebar from "./components/Sidebar.vue";
 import FileSelector from "./components/sidebar/FileSelector.vue";
@@ -88,6 +88,7 @@ async function loadProject() {
   newProject.filename = filename;
   project.value = newProject;
   setTitle(project.value.name, project.value.filename);
+  nextTick();
 }
 
 </script>

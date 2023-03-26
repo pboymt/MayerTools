@@ -326,6 +326,7 @@ export class Project implements Omit<IProject, 'rois'>{
         project.screenWidth = json.screenWidth;
         project.screenHeight = json.screenHeight;
         project.rois = new Map(json.rois.map((r: any) => [r.uuid, RegionOfInterest.fromJSON(r)]));
+        console.log(project);
         return project;
     }
 

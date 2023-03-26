@@ -30,10 +30,10 @@ export enum Anchor {
 }
 
 export class RegionOfInterest implements IRegionOfInterest {
-    uuid = crypto.randomUUID();
-    name = this.uuid;
 
     constructor(
+        public uuid: string = crypto.randomUUID(),
+        public name: string = uuid,
         public x: number = 0,
         public y: number = 0,
         public width: number = 50,
@@ -126,7 +126,7 @@ export class RegionOfInterest implements IRegionOfInterest {
      * @returns ROI
      */
     static fromJSON(json: IRegionOfInterest) {
-        return new RegionOfInterest(json.x, json.y, json.width, json.height, json.anchor, Rect.fromJSON(json.rect));
+        return new RegionOfInterest(json.uuid, json.name, json.x, json.y, json.width, json.height, json.anchor, Rect.fromJSON(json.rect));
     }
 
 }
