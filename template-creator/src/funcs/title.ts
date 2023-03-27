@@ -4,9 +4,9 @@ export function setTitle(name?: string, filename = '*') {
     let title = "Mayer Template Creator";
     if (name) {
         title += ` - ${name}`;
-    }
-    if (filename) {
-        title += ` - ${filename}`;
+        if (filename) {
+            title += ` - ${filename}`;
+        }
     }
     appWindow.setTitle(title);
 }

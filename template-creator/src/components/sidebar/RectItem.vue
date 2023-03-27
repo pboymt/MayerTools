@@ -64,7 +64,7 @@ div.rect-item {
 
     div.value {
         flex: 1 0 2rem;
-        text-align: center;
+        text-align: start;
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;

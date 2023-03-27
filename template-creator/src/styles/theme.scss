@@ -15,6 +15,7 @@
     --border-color: #e6e6e6;
     --hover-mask-color: rgba(255, 255, 255, 0.1);
     --active-mask-color: rgba(255, 255, 255, 0.2);
+    --shadow-color: rgba(255, 255, 255, 0.1);
 }
 
 
@@ -36,5 +37,6 @@
         --border-color: #3f3f3f;
         --hover-mask-color: rgba(255, 255, 255, 0.1);
         --active-mask-color: rgba(255, 255, 255, 0.2);
+        --shadow-color: rgba(0, 0, 0, 0.2);
     }
 }

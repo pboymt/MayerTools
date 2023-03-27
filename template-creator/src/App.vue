@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { open, OpenDialogOptions, save, SaveDialogOptions } from "@tauri-apps/api/dialog";
 import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
-import { nextTick, ref } from "vue";
+import { nextTick, ref, watch, onMounted } from "vue";
 import Panel from "./components/Panel.vue";
 import Sidebar from "./components/Sidebar.vue";
 import FileSelector from "./components/sidebar/FileSelector.vue";
@@ -11,12 +11,28 @@ import RectList from "./components/sidebar/RectList.vue";
 import Toolbar from "./components/sidebar/Toolbar.vue";
 import { Project } from "./dtos/Project";
 import { setTitle } from "./funcs/title";
+import { container as JenesiusModalContainer, config, promptModal } from "jenesius-vue-modal";
+import DialogConfirm from './components/dialogs/DialogConfirm.vue';
+import ProjectNamePrompt from "./components/dialogs/NewNamePrompt.vue";
+
+config({
+  backgroundClose: false,
+  escClose: false
+})
 
 const project = ref<Project>();
 const camera = ref<'ROI' | 'Rect'>('ROI');
 
+watch(() => project.value?.name, () => {
+  setTitle(project.value?.name, project.value?.filename);
+});
+
 function addROI() { project.value?.addROI(); }
-function clearROIs() { project.value?.clearROIs(); }
+async function clearROIs() {
+  const result = await openConfirm();
+  if (!result) return;
+  project.value?.clearROIs();
+}
 function removeROI() { project.value?.removeROI(); }
 function roiGoLeft() { project.value?.moveRoiX(-1); }
 function roiGoRight() { project.value?.moveRoiX(1); }
@@ -91,6 +107,33 @@ async function loadProject() {
   nextTick();
 }
 
+async function openConfirm() {
+  const result = await promptModal<boolean>(DialogConfirm)
+  return result;
+}
+
+async function changeProjectName() {
+  if (!project.value) return;
+  const result = await promptModal<string | null>(ProjectNamePrompt);
+  if (result === null) return;
+  project.value.name = result;
+}
+
+async function changeRoiName() {
+  if (!project.value || !project.value.selectedROI) return;
+  const selectedROI = project.value.selectedROI;
+  const result = await promptModal<string | null>(ProjectNamePrompt);
+  if (result === null) return;
+  selectedROI.name = result;
+}
+
+onMounted(() => {
+  if (project.value) {
+    setTitle(project.value.name, project.value.filename);
+  } else {
+    setTitle();
+  }
+});
 </script>
 
 <template>
@@ -102,7 +145,8 @@ async function loadProject() {
           @roi-height-expand="roiHeightExpand" @roi-height-shrink="roiHeightShrink" @rect-left="rectGoLeft"
           @rect-right="rectGoRight" @rect-up="rectGoUp" @rect-down="rectGoDown" @rect-width-expand="rectWidthExpand"
           @rect-width-shrink="rectWidthShrink" @rect-height-expand="rectHeightExpand"
-          @rect-height-shrink="rectHeightShrink" :camera="camera" @switch="switchCamera" />
+          @rect-height-shrink="rectHeightShrink" :camera="camera" @switch="switchCamera" @rename="changeProjectName"
+          @roi-rename="changeRoiName" />
         <RectList :rois="project?.rois" :selected="project?.selectedRoiId"
           @select="$event => project && (project.selectedRoiId = $event)" />
       </template>
@@ -116,6 +160,7 @@ async function loadProject() {
 
     <Panel v-if="project" :project="project"></Panel>
   </div>
+  <JenesiusModalContainer />
 </template>
 
 <style scoped>
