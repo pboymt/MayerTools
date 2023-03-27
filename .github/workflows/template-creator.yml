@@ -5,12 +5,12 @@ on:
     branches:
       - master
     paths:
-      - "template-creator"
+      - "template-creator/**"
   pull_request:
     branches:
       - master
     paths:
-      - "template-creator"
+      - "template-creator/**"
   workflow_dispatch:
 
 defaults:
