@@ -2,7 +2,7 @@
     <div class="modal-window">
         <div class="title">新的名称</div>
         <div class="content">
-            <input type="text" v-model="value" @input="handleInput">
+            <input type="text" v-model="value" autofocus @input="handleInput">
         </div>
         <div class="buttons">
             <button class="confirm" @click="emit(Modal.EVENT_PROMPT, value)">确定</button>
