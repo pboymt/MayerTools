@@ -1,7 +1,7 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { nextTick } from "vue";
 import { Bounds, IRegionOfInterest, RegionOfInterest, ROIs } from "./ROI";
-import { ScreenRatio } from "./ScreenRatio";
+import { ScreenRatio } from "./enums";
 import { Project as TProject, Project_RegionOfInterest, Project_ScreenRatio } from "./templates";
 
 export interface IProject {
@@ -63,7 +63,7 @@ export class Project implements Omit<IProject, 'rois'>{
      * 当前选中的 ROI 的 id
      */
     get selectedRoiId(): string {
-        return this._selectedRoiId;
+        return this._selectedRoiId.length === 0 ? this.rois.values().next().value?.uuid ?? '' : this._selectedRoiId;
     }
     set selectedRoiId(value: string) {
         this._selectedRoiId = value;
