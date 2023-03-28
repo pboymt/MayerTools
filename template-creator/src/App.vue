@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { open, OpenDialogOptions, save, SaveDialogOptions } from "@tauri-apps/api/dialog";
 import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
-import { nextTick, ref, watch, onMounted } from "vue";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { nextTick, ref, watch, onMounted, onUnmounted } from "vue";
 import Panel from "./components/Panel.vue";
 import Sidebar from "./components/Sidebar.vue";
 import FileSelector from "./components/sidebar/FileSelector.vue";
@@ -14,14 +15,16 @@ import { setTitle } from "./funcs/title";
 import { container as JenesiusModalContainer, config, promptModal } from "jenesius-vue-modal";
 import DialogConfirm from './components/dialogs/DialogConfirm.vue';
 import ProjectNamePrompt from "./components/dialogs/NewNamePrompt.vue";
+import { selectFile } from "./funcs/files";
+import { CameraType } from "./dtos/enums";
 
 config({
   backgroundClose: false,
   escClose: false
-})
+});
 
 const project = ref<Project>();
-const camera = ref<'ROI' | 'Rect'>('ROI');
+const camera = ref<CameraType>(CameraType.CAMERA_ROI);
 
 watch(() => project.value?.name, () => {
   setTitle(project.value?.name, project.value?.filename);
@@ -51,10 +54,14 @@ function rectHeightExpand() { project.value?.selectedROI?.changeRectHeight(1); }
 function rectWidthShrink() { project.value?.selectedROI?.changeRectWidth(-1); }
 function rectHeightShrink() { project.value?.selectedROI?.changeRectHeight(-1); }
 
-function switchCamera() { camera.value = camera.value === 'ROI' ? 'Rect' : 'ROI'; }
+function switchCamera() {
+  camera.value = camera.value === CameraType.CAMERA_ROI ? CameraType.CAMERA_RECT : CameraType.CAMERA_ROI;
+}
 
-async function createNewProject($event: string) {
-  const newProject = new Project($event);
+async function createNewProject() {
+  const filename = await selectFile();
+  if (!filename) return;
+  const newProject = new Project(filename);
   await newProject.loadScreenImage();
   newProject.filename = '*';
   project.value = newProject;
@@ -127,12 +134,37 @@ async function changeRoiName() {
   selectedROI.name = result;
 }
 
-onMounted(() => {
+let unEventProjectNew: UnlistenFn | undefined;
+let unEventProjectOpen: UnlistenFn | undefined;
+let unEventProjectSave: UnlistenFn | undefined;
+let unEventProjectSaveAs: UnlistenFn | undefined;
+let unEventProjectExport: UnlistenFn | undefined;
+
+onMounted(async () => {
   if (project.value) {
     setTitle(project.value.name, project.value.filename);
   } else {
     setTitle();
   }
+  unEventProjectNew = await listen('project-new', createNewProject);
+  unEventProjectOpen = await listen('project-open', loadProject);
+  unEventProjectSave = await listen('project-save', saveProject);
+  unEventProjectSaveAs = await listen('project-save-as', () => {
+    if (!project.value) return;
+    console.log(project.value.toProto());
+  });
+  unEventProjectExport = await listen('project-export', () => {
+    if (!project.value) return;
+    console.log(project.value.toJSON());
+  });
+});
+
+onUnmounted(() => {
+  if (typeof unEventProjectNew === 'function') unEventProjectNew();
+  if (typeof unEventProjectOpen === 'function') unEventProjectOpen();
+  if (typeof unEventProjectSave === 'function') unEventProjectSave();
+  if (typeof unEventProjectSaveAs === 'function') unEventProjectSaveAs();
+  if (typeof unEventProjectExport === 'function') unEventProjectExport();
 });
 </script>
 
@@ -154,11 +186,11 @@ onMounted(() => {
         <RatioSelector :project="project" />
         <Preview :project="project" />
         <!-- <input class="border-top" type="text" readonly v-model="filename"> -->
-        <FileSelector @change="createNewProject" @save="saveProject" @load="loadProject" />
+        <!-- <FileSelector @change="createNewProject" @save="saveProject" @load="loadProject" /> -->
       </template>
     </Sidebar>
 
-    <Panel v-if="project" :project="project"></Panel>
+    <Panel v-if="project" :project="project" :camera="camera"></Panel>
   </div>
   <JenesiusModalContainer />
 </template>

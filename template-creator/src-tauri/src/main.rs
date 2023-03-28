@@ -2,6 +2,7 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
+mod menus;
 
 use tauri::Manager;
 
@@ -12,13 +13,42 @@ fn greet(name: &str) -> String {
 }
 
 fn main() {
+    let menu = menus::create_menus();
     tauri::Builder::default()
+        .menu(menu)
+        .on_menu_event(|event| match event.menu_item_id() {
+            "app_quit" => {
+                std::process::exit(0);
+            }
+            "project_new" => {
+                event.window().emit("project-new", ()).unwrap();
+            }
+            "project_open" => {
+                event.window().emit("project-open", ()).unwrap();
+            }
+            "project_save" => {
+                event.window().emit("project-save", ()).unwrap();
+            }
+            "project_save_as" => {
+                event.window().emit("project-save-as", ()).unwrap();
+            }
+            "project_export" => {
+                event.window().emit("project-export", ()).unwrap();
+            }
+            "help_toggle_devtools" => {
+                let win = event.window();
+                if !win.is_devtools_open() {
+                    win.open_devtools();
+                }
+            }
+            _ => {}
+        })
         .setup(|app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
             {
-                let window = app.get_window("main").unwrap();
-                window.open_devtools();
-                window.close_devtools();
+                let win = app.get_window("main").unwrap();
+                win.open_devtools();
+                win.close_devtools();
             }
             Ok(())
         })
