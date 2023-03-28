@@ -1,7 +1,7 @@
 <template>
     <div class="file-selector">
-        <button @click="selectFile">新建项目</button>
-        <button @click="emit('load')" >加载项目</button>
+        <button @click="emit('new')">新建项目</button>
+        <button @click="emit('load')">加载项目</button>
         <button @click="emit('save')">保存项目</button>
     </div>
 </template>
@@ -9,20 +9,8 @@
 <script setup lang="ts">
 import { open } from '@tauri-apps/api/dialog';
 
-const emit = defineEmits(['change', 'save', 'load']);
+const emit = defineEmits(['new', 'save', 'load']);
 
-async function selectFile() {
-    const result = await open({
-        multiple: false,
-        filters: [{
-            name: 'Image',
-            extensions: ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp']
-        }]
-    });
-    if (typeof result === 'string' && result.length > 0) {
-        emit('change', result);
-    }
-}
 </script>
 
 <style scoped lang="scss">

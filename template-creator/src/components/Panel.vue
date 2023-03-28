@@ -11,12 +11,13 @@
 <script setup lang="ts">
 import { Project } from "@/dtos/Project";
 import { Bounds, Rect, ROIs } from "@/dtos/ROI";
-import { ScreenRatio } from "@/dtos/ScreenRatio";
+import { CameraType, ScreenRatio } from "@/dtos/enums";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 interface Props {
-    project: Project
+    project: Project,
+    camera: CameraType,
 }
 const props = defineProps<Props>();
 
@@ -96,6 +97,8 @@ function drawSafeArea() {
     }
 }
 
+let selectedRectBorderDashOffset = 0;
+
 /**
  * 绘制 ROI 中的 Rect
  */
@@ -121,6 +124,15 @@ function drawROIsRect() {
             // 叠加虚线
             mCtx.strokeStyle = 'white';
             mCtx.setLineDash([5, 5]);
+            if (props.camera === CameraType.CAMERA_RECT && isSelected) {
+                mCtx.lineDashOffset = -selectedRectBorderDashOffset;
+                selectedRectBorderDashOffset++;
+                if (selectedRectBorderDashOffset > 20) {
+                    selectedRectBorderDashOffset = 0;
+                }
+            } else {
+                mCtx.lineDashOffset = 0;
+            }
             // mCtx.strokeRect(roi.x + rect.x + safeArea.x, roi.y + rect.y + safeArea.y, rect.width, rect.height);
             mCtx.strokeRect(rectBounds.x, rectBounds.y, rectBounds.width, rectBounds.height);
             // mCtx.restore();
@@ -143,13 +155,16 @@ function drawSelectedRoiBorder() {
             mCtx.strokeStyle = 'red';
             mCtx.lineWidth = 2;
             mCtx.setLineDash([6, 6]);
-            mCtx.lineDashOffset = -selectedRoiBorderDashOffset;
-            // mCtx.strokeRect(roi.x + rect.x + safeArea.x, roi.y + rect.y + safeArea.y, rect.width, rect.height);
-            mCtx.strokeRect(roiBounds.x, roiBounds.y, roiBounds.width, roiBounds.height);
-            selectedRoiBorderDashOffset++;
-            if (selectedRoiBorderDashOffset > 24) {
-                selectedRoiBorderDashOffset = 0;
+            if (props.camera === CameraType.CAMERA_ROI) {
+                mCtx.lineDashOffset = -selectedRoiBorderDashOffset;
+                selectedRoiBorderDashOffset++;
+                if (selectedRoiBorderDashOffset > 24) {
+                    selectedRoiBorderDashOffset = 0;
+                }
+            } else {
+                mCtx.lineDashOffset = 0;
             }
+            mCtx.strokeRect(roiBounds.x, roiBounds.y, roiBounds.width, roiBounds.height);
         }
     }
 }

@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ScreenRatio } from '@/dtos/ScreenRatio';
+import { ScreenRatio } from '@/dtos/enums';
 import { Project } from '@/dtos/Project';
 
 interface Props {

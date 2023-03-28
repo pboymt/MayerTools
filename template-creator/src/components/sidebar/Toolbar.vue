@@ -13,7 +13,7 @@
         <ToolbarButton icon="cameraswitch" @click="emit('switch')" title="切换 ROI 和 Rect" />
     </div>
     <div class="toolbar">
-        <div class="toolbar-label" :class="{ camera: camera === 'ROI' }">
+        <div class="toolbar-label" :class="{ camera: camera === CameraType.CAMERA_ROI }">
             区域
         </div>
         <ToolbarButton icon="keyboard_arrow_left" @mousedown="mouseDown('roi-left')" @mouseup="mouseUp('roi-left')"
@@ -33,7 +33,7 @@
             @mouseup="mouseUp('roi-height-shrink')" @wheel="onWheel($event, true)" title="变低" />
     </div>
     <div class="toolbar">
-        <div class="toolbar-label" :class="{ camera: camera === 'Rect' }">
+        <div class="toolbar-label" :class="{ camera: camera === CameraType.CAMERA_RECT }">
             模板
         </div>
         <ToolbarButton icon="keyboard_arrow_left" @mousedown="mouseDown('rect-left')" @mouseup="mouseUp('rect-left')"
@@ -56,11 +56,12 @@
 </template>
 
 <script setup lang="ts">
+import { CameraType } from '@/dtos/enums';
 import { onBeforeUnmount, onMounted } from 'vue';
 import ToolbarButton from './toolbar/ToolbarButton.vue';
 
 interface Props {
-    camera: 'Rect' | 'ROI';
+    camera: CameraType;
 }
 
 const emit = defineEmits(['add', 'remove', 'clear', 'switch', 'rename', 'roi-rename',
@@ -68,7 +69,7 @@ const emit = defineEmits(['add', 'remove', 'clear', 'switch', 'rename', 'roi-ren
     'rect-left', 'rect-right', 'rect-up', 'rect-down', 'rect-width-expand', 'rect-width-shrink', 'rect-height-expand', 'rect-height-shrink'
 ]);
 const props = withDefaults(defineProps<Props>(), {
-    camera: 'ROI',
+    camera: CameraType.CAMERA_ROI,
 });
 
 const mouseActive = {
@@ -127,16 +128,16 @@ function keyDown($event: KeyboardEvent) {
     // console.log(key);
     switch (true) {
         case ['a', 'A', 'ArrowLeft'].includes(key):
-            mouseDown(props.camera === 'Rect' ? 'rect-left' : 'roi-left');
+            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-left' : 'roi-left');
             break;
         case ['d', 'D', 'ArrowRight'].includes(key):
-            mouseDown(props.camera === 'Rect' ? 'rect-right' : 'roi-right');
+            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-right' : 'roi-right');
             break;
         case ['w', 'W', 'ArrowUp'].includes(key):
-            mouseDown(props.camera === 'Rect' ? 'rect-up' : 'roi-up');
+            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-up' : 'roi-up');
             break;
         case ['s', 'S', 'ArrowDown'].includes(key):
-            mouseDown(props.camera === 'Rect' ? 'rect-down' : 'roi-down');
+            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-down' : 'roi-down');
             break;
     }
 }
@@ -145,16 +146,16 @@ function keyUp($event: KeyboardEvent) {
     const key = $event.key;
     switch (true) {
         case ['a', 'A'].includes(key):
-            props.camera === 'ROI' ? mouseUp('roi-left') : mouseUp('rect-left');
+            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-left') : mouseUp('rect-left');
             break;
         case ['d', 'D'].includes(key):
-            props.camera === 'ROI' ? mouseUp('roi-right') : mouseUp('rect-right');
+            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-right') : mouseUp('rect-right');
             break;
         case ['w', 'W'].includes(key):
-            props.camera === 'ROI' ? mouseUp('roi-up') : mouseUp('rect-up');
+            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-up') : mouseUp('rect-up');
             break;
         case ['s', 'S'].includes(key):
-            props.camera === 'ROI' ? mouseUp('roi-down') : mouseUp('rect-down');
+            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-down') : mouseUp('rect-down');
             break;
     }
 }
