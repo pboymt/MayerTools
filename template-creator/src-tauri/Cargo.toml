@@ -15,7 +15,7 @@ tauri-build = { version = "1.2", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.2", features = ["devtools", "dialog-open", "dialog-save", "fs-read-file", "fs-write-file", "notification-all", "protocol-all", "shell-open", "window-set-title"] }
+tauri = { version = "1.2", features = ["app-all", "devtools", "dialog-open", "dialog-save", "fs-read-file", "fs-write-file", "notification-all", "os-all", "protocol-all", "shell-open", "window-hide", "window-set-size", "window-set-title", "window-show", "window-start-dragging"] }
 
 [features]
 # by default Tauri runs in production mode

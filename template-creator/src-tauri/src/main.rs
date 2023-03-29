@@ -16,9 +16,12 @@ fn main() {
     let menu = menus::create_menus();
     tauri::Builder::default()
         .menu(menu)
-        .on_menu_event(|event| match event.menu_item_id() {
+        .on_menu_event(move |event| match event.menu_item_id() {
             "app_quit" => {
                 std::process::exit(0);
+            }
+            "window_close" => {
+                event.window().close().unwrap();
             }
             "project_new" => {
                 event.window().emit("project-new", ()).unwrap();
@@ -35,10 +38,16 @@ fn main() {
             "project_export" => {
                 event.window().emit("project-export", ()).unwrap();
             }
+            "help_about" => {
+                let about_window = event.window().get_window("about").unwrap();
+                if !about_window.is_visible().unwrap() {
+                    about_window.show().unwrap();
+                }
+            }
             "help_toggle_devtools" => {
-                let win = event.window();
-                if !win.is_devtools_open() {
-                    win.open_devtools();
+                let event_win = event.window();
+                if !event_win.is_devtools_open() {
+                    event_win.open_devtools();
                 }
             }
             _ => {}
@@ -49,6 +58,9 @@ fn main() {
                 let win = app.get_window("main").unwrap();
                 win.open_devtools();
                 win.close_devtools();
+                let about_win = app.get_window("about").unwrap();
+                about_win.open_devtools();
+                about_win.close_devtools();
             }
             Ok(())
         })

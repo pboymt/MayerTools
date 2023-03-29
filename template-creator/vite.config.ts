@@ -7,7 +7,6 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
-
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   // prevent vite from obscuring rust errors
   clearScreen: false,
@@ -25,6 +24,12 @@ export default defineConfig({
     }
   },
   build: {
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        about: path.resolve(__dirname, 'about.html'),
+      }
+    },
     // Tauri supports es2021
     target: process.env.TAURI_PLATFORM == "windows" ? "chrome105" : "safari13",
     // don't minify for debug builds
