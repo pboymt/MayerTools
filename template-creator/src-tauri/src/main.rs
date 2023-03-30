@@ -58,9 +58,9 @@ fn main() {
                 let win = app.get_window("main").unwrap();
                 win.open_devtools();
                 win.close_devtools();
-                let about_win = app.get_window("about").unwrap();
-                about_win.open_devtools();
-                about_win.close_devtools();
+                // let about_win = app.get_window("about").unwrap();
+                // about_win.open_devtools();
+                // about_win.close_devtools();
             }
             Ok(())
         })
