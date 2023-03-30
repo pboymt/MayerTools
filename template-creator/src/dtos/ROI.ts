@@ -1,3 +1,5 @@
+import { Project } from "./Project";
+
 export interface IRect {
     uuid: string;
     x: number;
@@ -31,20 +33,28 @@ export enum Anchor {
 
 export class RegionOfInterest implements IRegionOfInterest {
 
+    rect: Rect;
+
+    get bounds() {
+        return Bounds.fromROI(this, this.parent.safeArea);
+    }
+
     constructor(
+        public parent: Project,
         public uuid: string = crypto.randomUUID(),
         public name: string = uuid,
         public x: number = 0,
         public y: number = 0,
         public width: number = 50,
         public height: number = 50,
-        public anchor: Anchor = Anchor.CENTER,
-        public rect = new Rect()
+        public anchor: Anchor = Anchor.TOP_LEFT,
+        rect?: Rect
     ) {
         if (x < 0) this.x = 0;
         if (y < 0) this.y = 0;
         if (width < 1) this.width = 1;
         if (height < 1) this.height = 1;
+        this.rect = rect ?? new Rect(parent, this);
     }
 
     /**
@@ -125,8 +135,10 @@ export class RegionOfInterest implements IRegionOfInterest {
      * @param json JSON 对象
      * @returns ROI
      */
-    static fromJSON(json: IRegionOfInterest) {
-        return new RegionOfInterest(json.uuid, json.name, json.x, json.y, json.width, json.height, json.anchor, Rect.fromJSON(json.rect));
+    static fromJSON(project: Project, json: IRegionOfInterest) {
+        const roi = new RegionOfInterest(project, json.uuid, json.name, json.x, json.y, json.width, json.height, json.anchor);
+        roi.rect = Rect.fromJSON(project, roi, json.rect);
+        return roi;
     }
 
 }
@@ -134,7 +146,13 @@ export class RegionOfInterest implements IRegionOfInterest {
 export class Rect implements IRect {
     uuid = crypto.randomUUID();
 
+    get bounds() {
+        return Bounds.fromRect(this, this.roi, this.proj.safeArea);
+    }
+
     constructor(
+        public proj: Project,
+        public roi: RegionOfInterest,
         public x: number = 0,
         public y: number = 0,
         public width: number = 50,
@@ -160,8 +178,8 @@ export class Rect implements IRect {
      * @param json JSON 对象
      * @returns Rect
      */
-    static fromJSON(json: IRect) {
-        const rect = new Rect();
+    static fromJSON(project: Project, roi: RegionOfInterest, json: IRect) {
+        const rect = new Rect(project, roi);
         rect.uuid = json.uuid;
         rect.x = json.x;
         rect.y = json.y;

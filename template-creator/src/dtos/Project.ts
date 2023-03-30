@@ -126,7 +126,7 @@ export class Project implements Omit<IProject, 'rois'>{
      */
     addROI() {
         // console.log('add roi');
-        const roi = new RegionOfInterest();
+        const roi = new RegionOfInterest(this);
         this.rois.set(roi.uuid, roi);
         this.selectedRoiId = roi.uuid;
         nextTick();
@@ -291,7 +291,7 @@ export class Project implements Omit<IProject, 'rois'>{
         project.ratio = json.ratio;
         project.screenWidth = json.screenWidth;
         project.screenHeight = json.screenHeight;
-        project.rois = new Map(json.rois.map((r: any) => [r.uuid, RegionOfInterest.fromJSON(r)]));
+        project.rois = new Map(json.rois.map((r: any) => [r.uuid, RegionOfInterest.fromJSON(project, r)]));
         return project;
     }
 
@@ -325,7 +325,7 @@ export class Project implements Omit<IProject, 'rois'>{
         project.ratio = json.ratio as unknown as ScreenRatio;
         project.screenWidth = json.screenWidth;
         project.screenHeight = json.screenHeight;
-        project.rois = new Map(json.rois.map((r: any) => [r.uuid, RegionOfInterest.fromJSON(r)]));
+        project.rois = new Map(json.rois.map((r: any) => [r.uuid, RegionOfInterest.fromJSON(project, r)]));
         console.log(project);
         return project;
     }
