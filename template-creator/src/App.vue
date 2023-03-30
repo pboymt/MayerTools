@@ -2,21 +2,22 @@
 import { open, OpenDialogOptions, save, SaveDialogOptions } from "@tauri-apps/api/dialog";
 import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
-import { nextTick, ref, watch, onMounted, onUnmounted } from "vue";
-import Panel from "./components/Panel.vue";
-import Sidebar from "./components/Sidebar.vue";
-import FileSelector from "./components/sidebar/FileSelector.vue";
-import Preview from "./components/sidebar/Preview.vue";
-import RatioSelector from "./components/sidebar/RatioSelector.vue";
-import RectList from "./components/sidebar/RectList.vue";
-import Toolbar from "./components/sidebar/Toolbar.vue";
-import { Project } from "./dtos/Project";
-import { setTitle } from "./funcs/title";
+import { nextTick, ref, watch, onMounted, onUnmounted, provide } from "vue";
+import Panel from "@/components/Panel.vue";
+import Sidebar from "@/components/Sidebar.vue";
+// import FileSelector from "./components/sidebar/FileSelector.vue";
+import Preview from "@/components/sidebar/Preview.vue";
+import RatioSelector from "@/components/sidebar/RatioSelector.vue";
+import RectList from "@/components/sidebar/RectList.vue";
+import Toolbar from "@/components/sidebar/Toolbar.vue";
+import { Project } from "@/dtos/Project";
+import { setTitle } from "@/funcs/title";
 import { container as JenesiusModalContainer, config, promptModal } from "jenesius-vue-modal";
-import DialogConfirm from './components/dialogs/DialogConfirm.vue';
-import ProjectNamePrompt from "./components/dialogs/NewNamePrompt.vue";
-import { selectFile } from "./funcs/files";
-import { CameraType } from "./dtos/enums";
+import DialogConfirm from '@/components/dialogs/DialogConfirm.vue';
+import ProjectNamePrompt from "@/components/dialogs/NewNamePrompt.vue";
+import { selectFile } from "@/funcs/files";
+import { CameraType } from "@/dtos/enums";
+import { cameraTypeInjectKey, projectInjectKey } from "@/utils/injects";
 
 config({
   backgroundClose: false,
@@ -25,6 +26,9 @@ config({
 
 const project = ref<Project>();
 const camera = ref<CameraType>(CameraType.CAMERA_ROI);
+
+provide(projectInjectKey, project);
+provide(cameraTypeInjectKey, camera);
 
 watch(() => project.value?.name, () => {
   setTitle(project.value?.name, project.value?.filename);
@@ -172,25 +176,20 @@ onUnmounted(() => {
   <div class="container">
     <Sidebar>
       <template #top>
-        <Toolbar @add="addROI" @remove="removeROI" @clear="clearROIs" @roi-left="roiGoLeft" @roi-right="roiGoRight"
-          @roi-up="roiGoUp" @roi-down="roiGoDown" @roi-width-expand="roiWidthExpand" @roi-width-shrink="roiWidthShrink"
-          @roi-height-expand="roiHeightExpand" @roi-height-shrink="roiHeightShrink" @rect-left="rectGoLeft"
-          @rect-right="rectGoRight" @rect-up="rectGoUp" @rect-down="rectGoDown" @rect-width-expand="rectWidthExpand"
-          @rect-width-shrink="rectWidthShrink" @rect-height-expand="rectHeightExpand"
-          @rect-height-shrink="rectHeightShrink" :camera="camera" @switch="switchCamera" @rename="changeProjectName"
+        <Toolbar @add="addROI" @remove="removeROI" @clear="clearROIs" @switch="switchCamera" @rename="changeProjectName"
           @roi-rename="changeRoiName" />
         <RectList :rois="project?.rois" :selected="project?.selectedRoiId"
-          @select="$event => project && (project.selectedRoiId = $event)" />
+          @select="($event: string) => project && (project.selectedRoiId = $event)" />
       </template>
       <template #bottom>
-        <RatioSelector :project="project" />
-        <Preview :project="project" />
+        <RatioSelector />
+        <Preview />
         <!-- <input class="border-top" type="text" readonly v-model="filename"> -->
         <!-- <FileSelector @change="createNewProject" @save="saveProject" @load="loadProject" /> -->
       </template>
     </Sidebar>
 
-    <Panel v-if="project" :project="project" :camera="camera"></Panel>
+    <Panel v-if="project"></Panel>
   </div>
   <JenesiusModalContainer />
 </template>

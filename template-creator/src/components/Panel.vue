@@ -2,24 +2,16 @@
     <div class="panel">
         <canvas ref="rBgCanvasElement" width="100" height="100"></canvas>
         <canvas ref="rCanvasElement" width="100" height="100"></canvas>
-        <!-- <div class="image">
-            <img :src="image" alt="请选择图片">
-            <div class="safe-area"></div>
-        </div> -->
     </div>
 </template>
 <script setup lang="ts">
-import { Project } from "@/dtos/Project";
-import { Bounds, Rect, ROIs } from "@/dtos/ROI";
-import { CameraType, ScreenRatio } from "@/dtos/enums";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { CameraType } from "@/dtos/enums";
+import { Bounds, Rect } from "@/dtos/ROI";
+import { cameraTypeInjectKey, projectInjectKey } from "@/utils/injects";
+import { inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-interface Props {
-    project: Project,
-    camera: CameraType,
-}
-const props = defineProps<Props>();
+const project = inject(projectInjectKey);
+const camera  = inject(cameraTypeInjectKey);
 
 const rBgCanvasElement = ref<HTMLCanvasElement>();
 const rCanvasElement = ref<HTMLCanvasElement>();
@@ -27,16 +19,16 @@ const rCanvasElement = ref<HTMLCanvasElement>();
 let mAnimationFrameId: number | null = null;
 let mCtx: CanvasRenderingContext2D | null = null;
 
-watch(() => props.project, (project) => {
+watch(() => project, (project) => {
     if (project) {
-        drawImageToCanvas(project);
+        drawImageToCanvas();
     }
 });
 
 onMounted(() => {
     mCtx = rCanvasElement.value!.getContext('2d')!;
     mCtx.save();
-    drawImageToCanvas(props.project);
+    drawImageToCanvas();
     mAnimationFrameId = requestAnimationFrame(refreshCanvas);
 });
 
@@ -46,8 +38,9 @@ onBeforeUnmount(() => {
     }
 });
 
-async function drawImageToCanvas(project: Project) {
-    const img = project.image!;
+async function drawImageToCanvas() {
+    if (project?.value == null) return;
+    const img = project.value.image!;
     const bgCanvas = rBgCanvasElement.value;
     const canvas = rCanvasElement.value;
     if (bgCanvas && canvas) {
@@ -67,9 +60,9 @@ async function drawImageToCanvas(project: Project) {
  * 刷新画布
  */
 function refreshCanvas() {
-    if (mCtx && props.project.image) {
+    if (mCtx && project?.value?.image) {
         // mCtx.drawImage(props.project.image, 0, 0);
-        mCtx.clearRect(0, 0, props.project.image!.width, props.project.image!.height);
+        mCtx.clearRect(0, 0, project.value.image.width, project.value.image!.height);
         drawSafeArea();
         drawSelectedRoiBorder();
         drawROIsRect();
@@ -83,8 +76,8 @@ let safeAreaDashOffset = 0;
  * 绘制安全区域，使用蚂蚁线
  */
 function drawSafeArea() {
-    if (mCtx && props.project.image) {
-        const { x, y, width: w, height: h } = props.project.safeArea;
+    if (mCtx && project?.value?.image) {
+        const { x, y, width: w, height: h } = project.value.safeArea;
         mCtx.strokeStyle = 'green';
         mCtx.lineWidth = 4;
         mCtx.setLineDash([16, 16]);
@@ -103,10 +96,10 @@ let selectedRectBorderDashOffset = 0;
  * 绘制 ROI 中的 Rect
  */
 function drawROIsRect() {
-    if (mCtx && props.project.image) {
-        const safeArea = props.project.safeArea;
+    if (mCtx && project?.value?.image) {
+        const safeArea = project.value.safeArea;
         // mCtx.save();
-        for (const roi of props.project.rois.values()) {
+        for (const roi of project.value.rois.values()) {
             const rect = roi.rect;
             const rectBounds = Bounds.fromRect(rect, roi, safeArea);
             mCtx.lineWidth = 2;
@@ -114,7 +107,7 @@ function drawROIsRect() {
             mCtx.setLineDash([]);
             mCtx.lineDashOffset = 0;
             // 是否选中
-            const isSelected = roi.uuid === props.project.selectedRoiId;
+            const isSelected = roi.uuid === project.value.selectedRoiId;
             if (isSelected) { // 选中的绘制红色边框
                 mCtx.lineWidth = 4;
                 mCtx.strokeStyle = 'red';
@@ -124,7 +117,7 @@ function drawROIsRect() {
             // 叠加虚线
             mCtx.strokeStyle = 'white';
             mCtx.setLineDash([5, 5]);
-            if (props.camera === CameraType.CAMERA_RECT && isSelected) {
+            if (camera?.value === CameraType.CAMERA_RECT && isSelected) {
                 mCtx.lineDashOffset = -selectedRectBorderDashOffset;
                 selectedRectBorderDashOffset++;
                 if (selectedRectBorderDashOffset > 20) {
@@ -146,16 +139,16 @@ let selectedRoiBorderDashOffset = 0;
  * 绘制选中的 ROI 边框，使用蚂蚁线
  */
 function drawSelectedRoiBorder() {
-    if (mCtx && props.project.image) {
-        const safeArea = props.project.safeArea;
-        const roi = props.project.selectedROI;
+    if (mCtx && project?.value?.image) {
+        const safeArea = project.value.safeArea;
+        const roi = project.value.selectedROI;
         if (roi) {
             const rect = roi.rect;
             const roiBounds = Bounds.fromROI(roi, safeArea);
             mCtx.strokeStyle = 'red';
             mCtx.lineWidth = 2;
             mCtx.setLineDash([6, 6]);
-            if (props.camera === CameraType.CAMERA_ROI) {
+            if (camera?.value === CameraType.CAMERA_ROI) {
                 mCtx.lineDashOffset = -selectedRoiBorderDashOffset;
                 selectedRoiBorderDashOffset++;
                 if (selectedRoiBorderDashOffset > 24) {

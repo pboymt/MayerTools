@@ -19,24 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import { ScreenRatio } from '@/dtos/enums';
-import { Project } from '@/dtos/Project';
+import { projectInjectKey } from '@/utils/injects';
+import { inject } from 'vue';
 
-interface Props {
-    project?: Project;
-}
-
-const props = defineProps<Props>();
-
-// const value = computed({
-//     get() {
-//         return props.modelValue
-//     },
-//     set(value) {
-//         emit('update:modelValue', value)
-//     }
-// })
+const project = inject(projectInjectKey);
 </script>
 
 <style scoped lang="scss">

@@ -24,13 +24,13 @@
         <ToolbarButton icon="keyboard_arrow_down" @mousedown="mouseDown('roi-down')" @mouseup="mouseUp('roi-down')"
             title="下移" />
         <ToolbarButton icon="unfold_more" rotate @mousedown="mouseDown('roi-width-expand')"
-            @mouseup="mouseUp('roi-width-expand')" @wheel="onWheel($event, false)" title="加宽" />
+            @mouseup="mouseUp('roi-width-expand')" @wheel="onRoiWheel($event, 'roi', false)" title="加宽" />
         <ToolbarButton icon="unfold_less" rotate @mousedown="mouseDown('roi-width-shrink')"
-            @mouseup="mouseUp('roi-width-shrink')" @wheel="onWheel($event, false)" title="收窄" />
+            @mouseup="mouseUp('roi-width-shrink')" @wheel="onRoiWheel($event, 'roi', false)" title="收窄" />
         <ToolbarButton icon="unfold_more" @mousedown="mouseDown('roi-height-expand')"
-            @mouseup="mouseUp('roi-height-expand')" @wheel="onWheel($event, true)" title="增高" />
+            @mouseup="mouseUp('roi-height-expand')" @wheel="onRoiWheel($event, 'roi', true)" title="增高" />
         <ToolbarButton icon="unfold_less" @mousedown="mouseDown('roi-height-shrink')"
-            @mouseup="mouseUp('roi-height-shrink')" @wheel="onWheel($event, true)" title="变低" />
+            @mouseup="mouseUp('roi-height-shrink')" @wheel="onRoiWheel($event, 'roi', true)" title="变低" />
     </div>
     <div class="toolbar">
         <div class="toolbar-label" :class="{ camera: camera === CameraType.CAMERA_RECT }">
@@ -45,34 +45,36 @@
         <ToolbarButton icon="keyboard_arrow_down" @mousedown="mouseDown('rect-down')" @mouseup="mouseUp('rect-down')"
             title="下移" />
         <ToolbarButton icon="unfold_more" rotate @mousedown="mouseDown('rect-width-expand')"
-            @mouseup="mouseUp('rect-width-expand')" @wheel="onWheel($event, false)" title="加宽" />
+            @mouseup="mouseUp('rect-width-expand')" @wheel="onRoiWheel($event, 'rect', false)" title="加宽" />
         <ToolbarButton icon="unfold_less" rotate @mousedown="mouseDown('rect-width-shrink')"
-            @mouseup="mouseUp('rect-width-shrink')" @wheel="onWheel($event, false)" title="收窄" />
+            @mouseup="mouseUp('rect-width-shrink')" @wheel="onRoiWheel($event, 'rect', false)" title="收窄" />
         <ToolbarButton icon="unfold_more" @mousedown="mouseDown('rect-height-expand')"
-            @mouseup="mouseUp('rect-height-expand')" @wheel="onWheel($event, true)" title="增高" />
+            @mouseup="mouseUp('rect-height-expand')" @wheel="onRoiWheel($event, 'rect', true)" title="增高" />
         <ToolbarButton icon="unfold_less" @mousedown="mouseDown('rect-height-shrink')"
-            @mouseup="mouseUp('rect-height-shrink')" @wheel="onWheel($event, true)" title="变低" />
+            @mouseup="mouseUp('rect-height-shrink')" @wheel="onRoiWheel($event, 'rect', true)" title="变低" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { CameraType } from '@/dtos/enums';
-import { onBeforeUnmount, onMounted } from 'vue';
+import { cameraTypeInjectKey, projectInjectKey } from '@/utils/injects';
+import { inject, onBeforeUnmount, onMounted } from 'vue';
 import ToolbarButton from './toolbar/ToolbarButton.vue';
 
-interface Props {
-    camera: CameraType;
-}
 
 const emit = defineEmits(['add', 'remove', 'clear', 'switch', 'rename', 'roi-rename',
     'roi-left', 'roi-right', 'roi-up', 'roi-down', 'roi-width-expand', 'roi-width-shrink', 'roi-height-expand', 'roi-height-shrink',
     'rect-left', 'rect-right', 'rect-up', 'rect-down', 'rect-width-expand', 'rect-width-shrink', 'rect-height-expand', 'rect-height-shrink'
 ]);
-const props = withDefaults(defineProps<Props>(), {
-    camera: CameraType.CAMERA_ROI,
-});
 
-const mouseActive = {
+const project = inject(projectInjectKey, null);
+const camera = inject(cameraTypeInjectKey);
+
+type EventTypes = Parameters<typeof emit>[0]
+
+// an object with key as event type and value as function
+
+const mouseActive: Record<EventTypes, boolean> = {
     // ROI
     'roi-left': false,
     'roi-right': false,
@@ -91,23 +93,67 @@ const mouseActive = {
     'rect-width-shrink': false,
     'rect-height-expand': false,
     'rect-height-shrink': false,
+    // others
+    add: false,
+    remove: false,
+    clear: false,
+    switch: false,
+    rename: false,
+    'roi-rename': false
+};
+
+const mouseFuncs: Record<EventTypes, () => void> = {
+    'roi-left'() { project?.value?.moveRoiX(-1); },
+    'roi-right'() { project?.value?.moveRoiX(1); },
+    'roi-up'() { project?.value?.moveRoiY(-1); },
+    'roi-down'() { project?.value?.moveRoiY(1); },
+    'roi-width-expand'() { project?.value?.changeRoiWidth(1); },
+    'roi-height-expand'() { project?.value?.changeRoiHeight(1); },
+    'roi-width-shrink'() { project?.value?.changeRoiWidth(-1); },
+    'roi-height-shrink'() { project?.value?.changeRoiHeight(-1); },
+    'rect-left'() { project?.value?.selectedROI?.moveRectX(-1); },
+    'rect-right'() { project?.value?.selectedROI?.moveRectX(1); },
+    'rect-up'() { project?.value?.selectedROI?.moveRectY(-1); },
+    'rect-down'() { project?.value?.selectedROI?.moveRectY(1); },
+    'rect-width-expand'() { project?.value?.selectedROI?.changeRectWidth(1); },
+    'rect-height-expand'() { project?.value?.selectedROI?.changeRectHeight(1); },
+    'rect-width-shrink'() { project?.value?.selectedROI?.changeRectWidth(-1); },
+    'rect-height-shrink'() { project?.value?.selectedROI?.changeRectHeight(-1); },
+    // others
+    add() { emit('add') },
+    remove() { emit('remove') },
+    clear() { emit('clear') },
+    switch() {
+        switch (camera?.value) {
+            case CameraType.CAMERA_ROI:
+                camera.value = CameraType.CAMERA_RECT;
+                break;
+            case CameraType.CAMERA_RECT:
+                camera.value = CameraType.CAMERA_ROI;
+                break;
+        }
+    },
+    rename() { emit('rename') },
+    'roi-rename'() { emit('roi-rename') },
 }
 let timeout = 0;
 // When the mouse is pressed, an event is triggered. After waiting for 500 ms, if the mouse button is not raised, the event is continuously triggered at 50 ms intervals.
 
-function mouseDown(event: keyof typeof mouseActive, keyboard = false) {
+function mouseDown(event: EventTypes, keyboard = false) {
     if (keyboard) {
-        emit(event);
+        mouseFuncs[event]();
         return;
     }
     if (!mouseActive[event]) {
-        mouseActive[event] = true
-        emit(event)
+        mouseActive[event] = true;
+        // 执行一次
+        mouseFuncs[event]();
         setTimeout(() => {
+            // 500ms后如果还未抬起就循环执行
             if (mouseActive[event]) {
                 const interval = setInterval(() => {
                     if (mouseActive[event]) {
-                        emit(event)
+                        mouseFuncs[event]();
                     } else {
                         clearInterval(interval)
                     }
@@ -128,16 +174,16 @@ function keyDown($event: KeyboardEvent) {
     // console.log(key);
     switch (true) {
         case ['a', 'A', 'ArrowLeft'].includes(key):
-            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-left' : 'roi-left');
+            mouseDown(camera?.value === CameraType.CAMERA_RECT ? 'rect-left' : 'roi-left');
             break;
         case ['d', 'D', 'ArrowRight'].includes(key):
-            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-right' : 'roi-right');
+            mouseDown(camera?.value === CameraType.CAMERA_RECT ? 'rect-right' : 'roi-right');
             break;
         case ['w', 'W', 'ArrowUp'].includes(key):
-            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-up' : 'roi-up');
+            mouseDown(camera?.value === CameraType.CAMERA_RECT ? 'rect-up' : 'roi-up');
             break;
         case ['s', 'S', 'ArrowDown'].includes(key):
-            mouseDown(props.camera === CameraType.CAMERA_RECT ? 'rect-down' : 'roi-down');
+            mouseDown(camera?.value === CameraType.CAMERA_RECT ? 'rect-down' : 'roi-down');
             break;
     }
 }
@@ -146,35 +192,34 @@ function keyUp($event: KeyboardEvent) {
     const key = $event.key;
     switch (true) {
         case ['a', 'A'].includes(key):
-            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-left') : mouseUp('rect-left');
+            camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-left') : mouseUp('rect-left');
             break;
         case ['d', 'D'].includes(key):
-            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-right') : mouseUp('rect-right');
+            camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-right') : mouseUp('rect-right');
             break;
         case ['w', 'W'].includes(key):
-            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-up') : mouseUp('rect-up');
+            camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-up') : mouseUp('rect-up');
             break;
         case ['s', 'S'].includes(key):
-            props.camera === CameraType.CAMERA_ROI ? mouseUp('roi-down') : mouseUp('rect-down');
+            camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-down') : mouseUp('rect-down');
             break;
     }
 }
 
-function onWheel($event: WheelEvent, height = false) {
+function onRoiWheel($event: WheelEvent, type: 'roi' | 'rect', height = false) {
     if (height) {
         if ($event.deltaY > 0) {
-            emit('roi-height-shrink');
+            mouseFuncs[`${type}-height-shrink`]();
         } else {
-            emit('roi-height-expand');
+            mouseFuncs[`${type}-height-expand`]();
         }
     } else {
         if ($event.deltaY > 0) {
-            emit('roi-width-shrink');
+            mouseFuncs[`${type}-width-shrink`]();
         } else {
-            emit('roi-width-expand');
+            mouseFuncs[`${type}-width-expand`]();
         }
     }
-
 }
 
 onMounted(() => {

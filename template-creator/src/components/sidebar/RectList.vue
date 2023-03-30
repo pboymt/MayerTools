@@ -1,8 +1,8 @@
 <template>
     <div class="rect-list">
-        <template v-if="rois">
-            <RectItem v-for="roi in rois.values()" :key="roi.uuid" :roi="roi" :selected="selected!"
-                @click="emit('select', roi.uuid)" />
+        <template v-if="project">
+            <RectItem v-for="[_, roi] in project.rois" :key="roi.uuid" :roi="roi" :selected="project.selectedRoiId"
+                @click="project!.selectedRoiId = roi.uuid" />
         </template>
         <template v-else>
             <div class="nothing-alert">
@@ -14,13 +14,12 @@
 
 <script setup lang="ts">
 import { Rect, ROIs } from '@/dtos/ROI';
+import { projectInjectKey } from '@/utils/injects';
+import { inject } from 'vue';
 import RectItem from './RectItem.vue';
-interface Props {
-    rois?: ROIs;
-    selected?: string;
-}
 
-const props = defineProps<Props>();
+const project = inject(projectInjectKey);
+
 const emit = defineEmits(['select']);
 </script>
 
