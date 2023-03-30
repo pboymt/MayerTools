@@ -162,11 +162,6 @@ function drawSelectedRoiBorder() {
     }
 }
 </script>
-<script lang="ts">
-const defaultRects = [
-    new Rect(0, 0, 100, 100)
-]
-</script>
 <style scoped lang="scss">
 div.panel {
     position: relative;
