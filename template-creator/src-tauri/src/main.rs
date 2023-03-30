@@ -4,7 +4,7 @@
 )]
 mod menus;
 
-use tauri::Manager;
+use tauri::{Manager, WindowEvent};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -48,6 +48,15 @@ fn main() {
                 let event_win = event.window();
                 if !event_win.is_devtools_open() {
                     event_win.open_devtools();
+                }
+            }
+            _ => {}
+        })
+        .on_window_event(move |event| match event.event() {
+            WindowEvent::Destroyed => {
+                if event.window().label() == "main" {
+                    event.window().get_window("about").unwrap().close().unwrap();
+                    std::process::exit(0);
                 }
             }
             _ => {}
