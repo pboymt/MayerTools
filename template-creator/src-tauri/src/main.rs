@@ -4,7 +4,7 @@
 )]
 mod menus;
 
-use tauri::{Manager, WindowEvent};
+use tauri::{Manager, Menu};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -39,10 +39,27 @@ fn main() {
                 event.window().emit("project-export", ()).unwrap();
             }
             "help_about" => {
-                let about_window = event.window().get_window("about").unwrap();
-                if !about_window.is_visible().unwrap() {
-                    about_window.show().unwrap();
+                let app_handle = event.window().app_handle();
+                if app_handle.get_window("about").is_some() {
+                    app_handle.get_window("about").unwrap().set_focus().unwrap();
+                    return;
                 }
+                tauri::WindowBuilder::new(
+                    &app_handle,
+                    "about",
+                    tauri::WindowUrl::App("about.html".into()),
+                )
+                .title("关于 Mayer Template Creator")
+                .menu(Menu::default())
+                .resizable(false)
+                .inner_size(500.0, 400.0)
+                .focused(true)
+                .max_inner_size(500.0, 400.0)
+                .min_inner_size(500.0, 400.0)
+                .owner_window(event.window().hwnd().unwrap())
+                .center()
+                .build()
+                .unwrap();
             }
             "help_toggle_devtools" => {
                 let event_win = event.window();
@@ -52,15 +69,15 @@ fn main() {
             }
             _ => {}
         })
-        .on_window_event(move |event| match event.event() {
-            WindowEvent::Destroyed => {
-                if event.window().label() == "main" {
-                    event.window().get_window("about").unwrap().close().unwrap();
-                    std::process::exit(0);
-                }
-            }
-            _ => {}
-        })
+        // .on_window_event(move |event| match event.event() {
+        //     tauri::WindowEvent::Destroyed => {
+        //         if event.window().label() == "main" {
+        //             event.window().get_window("about").unwrap().close().unwrap();
+        //             std::process::exit(0);
+        //         }
+        //     }
+        //     _ => {}
+        // })
         .setup(|app| {
             #[cfg(debug_assertions)] // only include this code on debug builds
             {

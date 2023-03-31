@@ -139,20 +139,6 @@
         "width": 800,
         "minHeight": 600,
         "minWidth": 800
-      },
-      {
-        "label": "about",
-        "fullscreen": false,
-        "height": 400,
-        "resizable": false,
-        "title": "About Mayer Template Creator",
-        "width": 500,
-        "maxHeight": 400,
-        "maxWidth": 500,
-        "url": "about.html",
-        "center": true,
-        "decorations": false,
-        "visible": false
       }
     ]
   }

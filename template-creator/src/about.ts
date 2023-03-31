@@ -17,10 +17,10 @@ createApp(App).mount("#app");
 //     });
 // });
 
-window.addEventListener('resize', () => {
-    const { innerHeight, innerWidth } = window;
-    if (innerHeight > 400 || innerWidth > 500) {
-        getCurrent().setSize(new LogicalSize(500, 400));
-    }
-});
+// window.addEventListener('resize', () => {
+//     const { innerHeight, innerWidth } = window;
+//     if (innerHeight > 400 || innerWidth > 500) {
+//         getCurrent().setSize(new LogicalSize(500, 400));
+//     }
+// });
 

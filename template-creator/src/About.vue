@@ -1,5 +1,5 @@
 <template>
-    <div class="title-bar">
+    <!-- <div class="title-bar">
         <div class="title" data-tauri-drag-region>
             关于
         </div>
@@ -8,7 +8,7 @@
                 ×
             </div>
         </div>
-    </div>
+    </div> -->
     <div class="about-content">
         <div class="left-side">
             <img src="/src/assets/icon.png" alt="Vite Logo" />
