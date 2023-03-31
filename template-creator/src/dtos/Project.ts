@@ -40,6 +40,9 @@ export interface IProject {
     dataURL: string;
 }
 
+/**
+ * 工程对象
+ */
 export class Project implements Omit<IProject, 'rois'>{
     version: number = 1;
     uuid: string = crypto.randomUUID();
