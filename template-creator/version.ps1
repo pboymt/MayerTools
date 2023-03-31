@@ -16,3 +16,9 @@ $src_tauri_cargo_toml | Set-Content -Path src-tauri/Cargo.toml
 $src_tauri_tauri_conf_json = Get-Content -Path src-tauri/tauri.conf.json
 $src_tauri_tauri_conf_json = $src_tauri_tauri_conf_json -replace '"version": "[0-9]+\.[0-9]+\.[0-9]+"', "`"version`": ""$new_version"""
 $src_tauri_tauri_conf_json | Set-Content -Path src-tauri/tauri.conf.json
+
+# Git add
+git add .
+
+# Git commit with conventional commit message
+git commit -m "chore: Bump version to $new_version"
