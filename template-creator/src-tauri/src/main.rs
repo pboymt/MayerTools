@@ -44,7 +44,7 @@ fn main() {
                     app_handle.get_window("about").unwrap().set_focus().unwrap();
                     return;
                 }
-                tauri::WindowBuilder::new(
+                let mut new_window = tauri::WindowBuilder::new(
                     &app_handle,
                     "about",
                     tauri::WindowUrl::App("about.html".into()),
@@ -56,10 +56,11 @@ fn main() {
                 .focused(true)
                 .max_inner_size(500.0, 400.0)
                 .min_inner_size(500.0, 400.0)
-                .owner_window(event.window().hwnd().unwrap())
-                .center()
-                .build()
-                .unwrap();
+                .center();
+                if cfg!(target_os = "windows") {
+                    new_window = new_window.owner_window(event.window().hwnd().unwrap())
+                }
+                new_window.build().unwrap();
             }
             "help_toggle_devtools" => {
                 let event_win = event.window();
