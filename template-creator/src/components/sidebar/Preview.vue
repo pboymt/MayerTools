@@ -1,18 +1,7 @@
 <template>
     <div class="preview">
         <template v-if="project">
-            <div class="rect-info">
-                <ul>
-                    <li>ROI-X: {{ project.selectedROI?.x }}</li>
-                    <li>ROI-Y: {{ project.selectedROI?.y }}</li>
-                    <li>ROI-W: {{ project.selectedROI?.width }}</li>
-                    <li>ROI-H: {{ project.selectedROI?.height }}</li>
-                    <li>REC-X: {{ project.selectedROI?.rect.x }}</li>
-                    <li>REC-Y: {{ project.selectedROI?.rect.y }}</li>
-                    <li>REC-W: {{ project.selectedROI?.rect.width }}</li>
-                    <li>REC-H: {{ project.selectedROI?.rect.height }}</li>
-                </ul>
-            </div>
+            <RectInfo />
             <div class="rect-preview">
                 <canvas v-if="project.selectedROI" ref="rCanvasElement"></canvas>
                 <div v-else class="nothing-alert">
@@ -30,6 +19,7 @@
 import { Bounds } from "@/dtos/ROI";
 import { projectInjectKey } from "@/utils/injects";
 import { inject, onBeforeUnmount, onMounted, ref } from "vue";
+import RectInfo from "./preview/RectInfo.vue";
 
 let mAnimationFrameId: number | null = null;
 const project = inject(projectInjectKey);
@@ -85,7 +75,7 @@ div.preview {
     flex-grow: 0;
     flex-shrink: 0;
     align-items: stretch;
-    justify-content: start;
+    justify-content: center;
     overflow: hidden;
 
     border: {
@@ -93,30 +83,6 @@ div.preview {
             width: 1px;
             style: solid;
             color: var(--border-color);
-        }
-    }
-
-    div.rect-info {
-        display: flex;
-        flex-direction: column;
-        background-color: var(--background-color);
-        flex: 1;
-
-        border: {
-            right: {
-                width: 1px;
-                style: solid;
-                color: var(--border-color);
-            }
-        }
-
-        ul{
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            li{
-                line-height: 1.5rem;
-            }
         }
     }
 
