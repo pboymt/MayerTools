@@ -17,6 +17,8 @@ $src_tauri_tauri_conf_json = Get-Content -Path src-tauri/tauri.conf.json
 $src_tauri_tauri_conf_json = $src_tauri_tauri_conf_json -replace '"version": "[0-9]+\.[0-9]+\.[0-9]+"', "`"version`": ""$new_version"""
 $src_tauri_tauri_conf_json | Set-Content -Path src-tauri/tauri.conf.json
 
+cargo build
+
 # Git add
 git add .
 
