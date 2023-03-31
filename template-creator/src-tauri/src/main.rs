@@ -57,7 +57,8 @@ fn main() {
                 .max_inner_size(500.0, 400.0)
                 .min_inner_size(500.0, 400.0)
                 .center();
-                if cfg!(target_os = "windows") {
+                #[cfg(target_os = "windows")]
+                {
                     new_window = new_window.owner_window(event.window().hwnd().unwrap())
                 }
                 new_window.build().unwrap();
