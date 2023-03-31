@@ -1,34 +1,40 @@
 <script setup lang="ts">
-import { open, OpenDialogOptions, save, SaveDialogOptions } from "@tauri-apps/api/dialog";
-import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
-import { listen, UnlistenFn } from "@tauri-apps/api/event";
-import { nextTick, ref, watch, onMounted, onUnmounted, provide } from "vue";
 import Panel from "@/components/Panel.vue";
 import Sidebar from "@/components/Sidebar.vue";
+import { open, OpenDialogOptions, save, SaveDialogOptions } from "@tauri-apps/api/dialog";
+import { listen, UnlistenFn } from "@tauri-apps/api/event";
+import { readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
+import { nextTick, onMounted, onUnmounted, provide, ref, watch } from "vue";
 // import FileSelector from "./components/sidebar/FileSelector.vue";
+import DialogConfirm from '@/components/dialogs/DialogConfirm.vue';
+import ProjectNamePrompt from "@/components/dialogs/NewNamePrompt.vue";
+import Modal from "@/components/Modal.vue";
 import Preview from "@/components/sidebar/Preview.vue";
 import RatioSelector from "@/components/sidebar/RatioSelector.vue";
 import RectList from "@/components/sidebar/RectList.vue";
 import Toolbar from "@/components/sidebar/Toolbar.vue";
-import { Project } from "@/dtos/Project";
-import { setTitle } from "@/funcs/title";
-import { container as JenesiusModalContainer, config, promptModal } from "jenesius-vue-modal";
-import DialogConfirm from '@/components/dialogs/DialogConfirm.vue';
-import ProjectNamePrompt from "@/components/dialogs/NewNamePrompt.vue";
-import { selectFile } from "@/funcs/files";
 import { CameraType } from "@/dtos/enums";
-import { cameraTypeInjectKey, projectInjectKey } from "@/utils/injects";
+import { Project } from "@/dtos/Project";
+import { selectFile } from "@/funcs/files";
+import { setTitle } from "@/funcs/title";
+import { cameraTypeInjectKey, modalInjectKey, notificationsInjectKey, projectInjectKey } from "@/utils/injects";
+import Notifications from "./components/Notifications.vue";
+// import { config, container as JenesiusModalContainer, promptModal } from "jenesius-vue-modal";
 
-config({
-  backgroundClose: false,
-  escClose: false
-});
+// config({
+//   backgroundClose: false,
+//   escClose: false
+// });
 
 const project = ref<Project>();
 const camera = ref<CameraType>(CameraType.CAMERA_ROI);
+const modal = ref<InstanceType<typeof Modal> | null>(null);
+const notifications = ref<InstanceType<typeof Notifications> | null>(null);
 
 provide(projectInjectKey, project);
 provide(cameraTypeInjectKey, camera);
+provide(modalInjectKey, modal);
+provide(notificationsInjectKey, notifications);
 
 watch(() => project.value?.name, () => {
   setTitle(project.value?.name, project.value?.filename);
@@ -36,27 +42,12 @@ watch(() => project.value?.name, () => {
 
 function addROI() { project.value?.addROI(); }
 async function clearROIs() {
+  if (!project.value) return;
   const result = await openConfirm();
   if (!result) return;
-  project.value?.clearROIs();
+  project.value.clearROIs();
 }
 function removeROI() { project.value?.removeROI(); }
-function roiGoLeft() { project.value?.moveRoiX(-1); }
-function roiGoRight() { project.value?.moveRoiX(1); }
-function roiGoUp() { project.value?.moveRoiY(-1); }
-function roiGoDown() { project.value?.moveRoiY(1); }
-function roiWidthExpand() { project.value?.changeRoiWidth(1); }
-function roiHeightExpand() { project.value?.changeRoiHeight(1); }
-function roiWidthShrink() { project.value?.changeRoiWidth(-1); }
-function roiHeightShrink() { project.value?.changeRoiHeight(-1); }
-function rectGoLeft() { project.value?.selectedROI?.moveRectX(-1); }
-function rectGoRight() { project.value?.selectedROI?.moveRectX(1); }
-function rectGoUp() { project.value?.selectedROI?.moveRectY(-1); }
-function rectGoDown() { project.value?.selectedROI?.moveRectY(1); }
-function rectWidthExpand() { project.value?.selectedROI?.changeRectWidth(1); }
-function rectHeightExpand() { project.value?.selectedROI?.changeRectHeight(1); }
-function rectWidthShrink() { project.value?.selectedROI?.changeRectWidth(-1); }
-function rectHeightShrink() { project.value?.selectedROI?.changeRectHeight(-1); }
 
 function switchCamera() {
   camera.value = camera.value === CameraType.CAMERA_ROI ? CameraType.CAMERA_RECT : CameraType.CAMERA_ROI;
@@ -119,23 +110,38 @@ async function loadProject() {
 }
 
 async function openConfirm() {
-  const result = await promptModal<boolean>(DialogConfirm)
+  // const result = await promptModal<boolean>(DialogConfirm)
+  // return result;
+  const result = await modal.value?.openPrompt<boolean>(DialogConfirm);
   return result;
 }
 
 async function changeProjectName() {
   if (!project.value) return;
-  const result = await promptModal<string | null>(ProjectNamePrompt);
-  if (result === null) return;
-  project.value.name = result;
+  // const result = await promptModal<string | null>(ProjectNamePrompt);
+  // if (result === null) return;
+  // project.value.name = result;
+  const result = await modal.value?.openPrompt<string>(ProjectNamePrompt);
+  if (typeof result === 'string') {
+    project.value.name = result;
+  }
 }
 
 async function changeRoiName() {
   if (!project.value || !project.value.selectedROI) return;
   const selectedROI = project.value.selectedROI;
-  const result = await promptModal<string | null>(ProjectNamePrompt);
-  if (result === null) return;
-  selectedROI.name = result;
+  // const result = await promptModal<string | null>(ProjectNamePrompt);
+  // if (result === null) return;
+  // selectedROI.name = result;
+  const result = await modal.value?.openPrompt<string>(ProjectNamePrompt);
+  if (typeof result === 'string') {
+    selectedROI.name = result;
+  }
+}
+
+function showNotification() {
+  console.log('showNotification');
+  notifications.value?.addNotification('Hello World');
 }
 
 let unEventProjectNew: UnlistenFn | undefined;
@@ -177,7 +183,7 @@ onUnmounted(() => {
     <Sidebar>
       <template #top>
         <Toolbar @add="addROI" @remove="removeROI" @clear="clearROIs" @switch="switchCamera" @rename="changeProjectName"
-          @roi-rename="changeRoiName" />
+          @roi-rename="changeRoiName" @project-export="showNotification" />
         <RectList :rois="project?.rois" :selected="project?.selectedRoiId"
           @select="($event: string) => project && (project.selectedRoiId = $event)" />
       </template>
@@ -191,7 +197,9 @@ onUnmounted(() => {
 
     <Panel v-if="project"></Panel>
   </div>
-  <JenesiusModalContainer />
+  <!-- <JenesiusModalContainer /> -->
+  <Modal ref="modal" />
+  <Notifications ref="notifications" />
 </template>
 
 <style scoped>

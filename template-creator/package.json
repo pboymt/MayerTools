@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
-    "jenesius-vue-modal": "^1.8.2",
     "vue": "^3.2.45"
   },
   "devDependencies": {

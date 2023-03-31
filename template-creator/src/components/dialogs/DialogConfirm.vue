@@ -3,16 +3,15 @@
         <div class="title">确定？</div>
         <div class="content">你确定要这么做吗？</div>
         <div class="buttons">
-            <button class="confirm" @click="emit(Modal.EVENT_PROMPT, true)">是</button>
-            <button class="cancel" @click="emit(Modal.EVENT_PROMPT, false)">否</button>
+            <button class="confirm" @click="emit('dialog-event-prompt', true)">是</button>
+            <button class="cancel" @click="emit('dialog-event-prompt', false)">否</button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { Modal } from "jenesius-vue-modal";
 
-const emit = defineEmits([Modal.EVENT_PROMPT]);
+const emit = defineEmits(['dialog-event-prompt']);
 
 </script>
 

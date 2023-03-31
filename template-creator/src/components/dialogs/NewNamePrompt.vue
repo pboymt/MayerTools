@@ -5,19 +5,18 @@
             <input type="text" v-model="value" autofocus @input="handleInput">
         </div>
         <div class="buttons">
-            <button class="confirm" @click="emit(Modal.EVENT_PROMPT, value)">确定</button>
-            <button class="cancel" @click="emit(Modal.EVENT_PROMPT, null)">取消</button>
+            <button class="confirm" @click="emit('dialog-event-prompt', value)">确定</button>
+            <button class="cancel" @click="emit('dialog-event-prompt', undefined)">取消</button>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { Modal } from "jenesius-vue-modal";
 import { ref } from "vue";
 
 const value = ref("");
 
-const emit = defineEmits([Modal.EVENT_PROMPT]);
+const emit = defineEmits(['dialog-event-prompt']);
 
 function handleInput(e: any) {
     const event = e as InputEvent;

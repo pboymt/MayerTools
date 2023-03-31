@@ -6,7 +6,7 @@
         <ToolbarButton icon="add" @click="emit('add')" title="添加 ROI" />
         <ToolbarButton icon="remove" @click="emit('remove')" title="移除选中的 ROI" />
         <ToolbarButton icon="clear_all" @click="emit('clear')" title="清除所有的 ROI" />
-        <ToolbarButton icon="chip_extraction" disabled title="导出" />
+        <ToolbarButton icon="chip_extraction" title="导出" disabled @click="emit('project-export')" />
         <ToolbarButton icon="edit" title="重命名项目" @click="emit('rename')" />
         <ToolbarButton icon="edit_note" title="重命名选中的 ROI" @click="emit('roi-rename')" />
         <ToolbarButton icon="tune" disabled title="设置" />
@@ -62,7 +62,7 @@ import { inject, onBeforeUnmount, onMounted } from 'vue';
 import ToolbarButton from './toolbar/ToolbarButton.vue';
 
 
-const emit = defineEmits(['add', 'remove', 'clear', 'switch', 'rename', 'roi-rename',
+const emit = defineEmits(['add', 'remove', 'clear', 'switch', 'rename', 'roi-rename', 'project-export',
     'roi-left', 'roi-right', 'roi-up', 'roi-down', 'roi-width-expand', 'roi-width-shrink', 'roi-height-expand', 'roi-height-shrink',
     'rect-left', 'rect-right', 'rect-up', 'rect-down', 'rect-width-expand', 'rect-width-shrink', 'rect-height-expand', 'rect-height-shrink'
 ]);
@@ -99,7 +99,8 @@ const mouseActive: Record<EventTypes, boolean> = {
     clear: false,
     switch: false,
     rename: false,
-    'roi-rename': false
+    'roi-rename': false,
+    'project-export': false,
 };
 
 const mouseFuncs: Record<EventTypes, () => void> = {
@@ -135,6 +136,7 @@ const mouseFuncs: Record<EventTypes, () => void> = {
     },
     rename() { emit('rename') },
     'roi-rename'() { emit('roi-rename') },
+    'project-export'() { emit('project-export') },
 }
 let timeout = 0;
 // When the mouse is pressed, an event is triggered. After waiting for 500 ms, if the mouse button is not raised, the event is continuously triggered at 50 ms intervals.
@@ -191,16 +193,16 @@ function keyDown($event: KeyboardEvent) {
 function keyUp($event: KeyboardEvent) {
     const key = $event.key;
     switch (true) {
-        case ['a', 'A'].includes(key):
+        case ['a', 'A', 'ArrowLeft'].includes(key):
             camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-left') : mouseUp('rect-left');
             break;
-        case ['d', 'D'].includes(key):
+        case ['d', 'D', 'ArrowRight'].includes(key):
             camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-right') : mouseUp('rect-right');
             break;
-        case ['w', 'W'].includes(key):
+        case ['w', 'W', 'ArrowUp'].includes(key):
             camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-up') : mouseUp('rect-up');
             break;
-        case ['s', 'S'].includes(key):
+        case ['s', 'S', 'ArrowDown'].includes(key):
             camera?.value === CameraType.CAMERA_ROI ? mouseUp('roi-down') : mouseUp('rect-down');
             break;
     }
