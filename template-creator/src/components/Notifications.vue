@@ -2,7 +2,12 @@
     <div class="notifications-container">
         <TransitionGroup name="list">
             <div class="notification" v-for="[uuid, item] in list" :key="uuid">
-                {{ item }}
+                <div class="content">
+                    {{ item }}
+                </div>
+                <div class="actions" @click="closeNotification(uuid)">
+                    <span class="material-symbols-outlined"> close </span>
+                </div>
             </div>
         </TransitionGroup>
     </div>
@@ -25,6 +30,16 @@ function addNotification(message: string, timeout = 5000) {
     return uuid;
 }
 
+function closeNotification(uuid: string) {
+    console.log('closeNotification', uuid);
+    list.value.delete(uuid);
+    const timeout = timeoutList.value.get(uuid);
+    if (timeout) {
+        window.clearTimeout(timeout);
+        timeoutList.value.delete(uuid);
+    }
+}
+
 defineExpose({
     addNotification
 });
@@ -38,6 +53,8 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 div.notifications-container {
+    --notification-width: 10rem;
+    --notification-height: 2rem;
     position: fixed;
     display: flex;
     flex-direction: column;
@@ -56,16 +73,15 @@ div.notifications-container {
 
     div.notification {
         // position: relative;
-        --notification-width: 10rem;
-        --notification-height: 3rem;
         flex: none;
         display: flex;
         flex-direction: row;
         justify-content: start;
-        align-items: center;
+        align-items: stretch;
         font-size: 1rem;
         background-color: var(--primary-color);
         padding: 0.2rem;
+        padding-left: 1rem;
         margin: 0.5rem;
         margin-right: 0;
         width: var(--notification-width);
@@ -110,8 +126,19 @@ div.notifications-container {
             justify-content: start;
             align-items: start;
             font-size: 1rem;
-            padding: 1rem;
+            // padding: 1rem;
             color: var(--text-color);
+        }
+
+        div.actions {
+            // flex: none;
+            // font-size: 0.5rem;
+            display: flex;
+            align-items: center;
+
+            span.material-symbols-outlined {
+                font-size: 1rem;
+            }
         }
     }
 }

@@ -68,6 +68,7 @@ async function saveProject() {
   if (project.value.filename.endsWith('.mtrepo')) {
     const data = project.value.toProto();
     await writeBinaryFile(project.value.filename, data);
+    notifications.value?.addNotification('保存成功');
     return;
   } else {
     const options: SaveDialogOptions = {
@@ -84,6 +85,7 @@ async function saveProject() {
     const data = project.value.toProto();
     await writeBinaryFile(filename, data);
     project.value.filename = filename;
+    notifications.value?.addNotification('保存成功');
   }
   setTitle(project.value.name, project.value.filename);
 }
