@@ -2693,7 +2693,7 @@ dependencies = [
 
 [[package]]
 name = "template-creator"
-version = "0.0.6"
+version = "0.0.7"
 dependencies = [
  "serde",
  "serde_json",
