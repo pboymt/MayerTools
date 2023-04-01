@@ -2,7 +2,8 @@
     <div class="rect-list">
         <template v-if="project">
             <RectItem v-for="[_, roi] in project.rois" :key="roi.uuid" :roi="roi" :selected="project.selectedRoiId"
-                @click="project!.selectedRoiId = roi.uuid" />
+                @click="project!.selectedRoiId = roi.uuid" @rename="emit('rename', roi.uuid)"
+                @duplicate="emit('duplicate', roi.uuid)" @remove="emit('remove', roi.uuid)" />
         </template>
         <template v-else>
             <div class="nothing-alert">
@@ -20,7 +21,7 @@ import RectItem from './RectItem.vue';
 
 const project = inject(projectInjectKey);
 
-const emit = defineEmits(['select']);
+const emit = defineEmits(['select', 'rename', 'remove', 'duplicate']);
 </script>
 
 <style scoped lang="scss">

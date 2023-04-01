@@ -19,6 +19,7 @@ import { selectFile } from "@/funcs/files";
 import { setTitle } from "@/funcs/title";
 import { cameraTypeInjectKey, modalInjectKey, notificationsInjectKey, projectInjectKey } from "@/utils/injects";
 import Notifications from "./components/Notifications.vue";
+import { RegionOfInterest } from "./dtos/ROI";
 // import { config, container as JenesiusModalContainer, promptModal } from "jenesius-vue-modal";
 
 // config({
@@ -40,15 +41,39 @@ watch(() => project.value?.name, () => {
   setTitle(project.value?.name, project.value?.filename);
 });
 
+/**
+ * 添加 ROI
+ */
 function addROI() { project.value?.addROI(); }
+
+/**
+ * 删除所有 ROI
+ */
 async function clearROIs() {
   if (!project.value) return;
   const result = await openConfirm();
   if (!result) return;
   project.value.clearROIs();
 }
-function removeROI() { project.value?.removeROI(); }
 
+/**
+ * 删除指定 ROI
+ * @param uuid 指定的 ROI UUID，未提供则删除选中的 ROI
+ */
+function removeROI(uuid?: string) { project.value?.removeROI(uuid); }
+
+/**
+ * 复制指定的 ROI
+ * @param uuid 指定的 ROI UUID
+ */
+function duplicateROI(uuid: string) {
+  if (!project.value) return;
+  project.value.duplicateROI(uuid);
+}
+
+/**
+ * 切换镜头
+ */
 function switchCamera() {
   camera.value = camera.value === CameraType.CAMERA_ROI ? CameraType.CAMERA_RECT : CameraType.CAMERA_ROI;
 }
@@ -129,12 +154,18 @@ async function changeProjectName() {
   }
 }
 
-async function changeRoiName() {
-  if (!project.value || !project.value.selectedROI) return;
-  const selectedROI = project.value.selectedROI;
-  // const result = await promptModal<string | null>(ProjectNamePrompt);
-  // if (result === null) return;
-  // selectedROI.name = result;
+async function changeRoiName(uuid?: string) {
+  if (!project.value) return;
+  let selectedROI: RegionOfInterest | undefined;
+  if (typeof uuid === 'string') {
+    selectedROI = project.value.rois.get(uuid);
+  } else {
+    selectedROI = project.value.selectedROI;
+  }
+  if (!selectedROI) {
+    notifications.value?.addNotification('没有选中的 ROI');
+    return;
+  }
   const result = await modal.value?.openPrompt<string>(ProjectNamePrompt);
   if (typeof result === 'string') {
     selectedROI.name = result;
@@ -187,7 +218,8 @@ onUnmounted(() => {
         <Toolbar @add="addROI" @remove="removeROI" @clear="clearROIs" @switch="switchCamera" @rename="changeProjectName"
           @roi-rename="changeRoiName" @project-export="showNotification" />
         <RectList :rois="project?.rois" :selected="project?.selectedRoiId"
-          @select="($event: string) => project && (project.selectedRoiId = $event)" />
+          @select="($event: string) => project && (project.selectedRoiId = $event)" @rename="changeRoiName"
+          @remove="removeROI" @duplicate="duplicateROI" />
       </template>
       <template #bottom>
         <RatioSelector />
