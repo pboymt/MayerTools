@@ -160,6 +160,21 @@ export class Project implements Omit<IProject, 'rois'>{
     }
 
     /**
+     * 复制指定 uuid 的 ROI
+     * @params uuid 要复制的 ROI 的 uuid
+     */
+    duplicateROI(uuid: string) {
+        // console.log('duplicate roi');
+        const roi = this.rois.get(uuid);
+        if (roi) {
+            const newRoi = roi.clone();
+            this.rois.set(newRoi.uuid, newRoi);
+            this.selectedRoiId = newRoi.uuid;
+            nextTick();
+        }
+    }
+
+    /**
      * 横向移动指定 id 的 ROI，如果不传 id 则移动当前选中的 ROI
      */
     moveRoiX(offset: number, id?: string) {

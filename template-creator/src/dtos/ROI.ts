@@ -131,6 +131,15 @@ export class RegionOfInterest implements IRegionOfInterest {
     }
 
     /**
+     * 克隆 ROI
+     */
+    clone() {
+        const roi = new RegionOfInterest(this.parent, undefined, this.name, this.x, this.y, this.width, this.height, this.anchor);
+        roi.rect = Rect.fromJSON(this.parent, roi, this.rect.toJSON())
+        return roi;
+    }
+
+    /**
      * 从 JSON 对象创建 ROI
      * @param json JSON 对象
      * @returns ROI
