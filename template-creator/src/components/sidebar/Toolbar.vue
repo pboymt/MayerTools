@@ -4,11 +4,11 @@
             操作
         </div>
         <ToolbarButton icon="add" @click="emit('add')" title="添加 ROI" />
-        <ToolbarButton icon="remove" @click="emit('remove')" title="移除选中的 ROI" />
+        <ToolbarButton icon="remove" @click="emit('remove')" disabled title="移除选中的 ROI" />
         <ToolbarButton icon="clear_all" @click="emit('clear')" title="清除所有的 ROI" />
         <ToolbarButton icon="chip_extraction" title="导出" disabled @click="emit('project-export')" />
         <ToolbarButton icon="edit" title="重命名项目" @click="emit('rename')" />
-        <ToolbarButton icon="edit_note" title="重命名选中的 ROI" @click="emit('roi-rename')" />
+        <ToolbarButton icon="edit_note" title="重命名选中的 ROI" disabled @click="emit('roi-rename')" />
         <ToolbarButton icon="tune" disabled title="设置" />
         <ToolbarButton icon="cameraswitch" @click="emit('switch')" title="切换 ROI 和 Rect" />
     </div>
