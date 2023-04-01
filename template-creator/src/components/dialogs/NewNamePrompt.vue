@@ -2,7 +2,7 @@
     <div class="modal-window">
         <div class="title">新的名称</div>
         <div class="content">
-            <input type="text" v-model="value" autofocus @input="handleInput">
+            <input type="text" v-model="value" autofocus @input="handleInput" @keypress="handleKeypress">
         </div>
         <div class="buttons">
             <button class="confirm" @click="emit('dialog-event-prompt', value)">确定</button>
@@ -24,6 +24,12 @@ function handleInput(e: any) {
         if (event.data === " ") {
             value.value = value.value.replace(" ", "");
         }
+    }
+}
+
+function handleKeypress(event: KeyboardEvent) {
+    if (!event.isComposing && event.key === 'Enter') {
+        emit('dialog-event-prompt', value.value.length ? value.value : undefined);
     }
 }
 </script>
