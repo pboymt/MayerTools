@@ -1,7 +1,8 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { nextTick } from "vue";
+import { DrawableProject } from "./Drawable";
+import { CameraType, ScreenRatio } from "./enums";
 import { Bounds, IRegionOfInterest, RegionOfInterest, ROIs } from "./ROI";
-import { ScreenRatio } from "./enums";
 import { Project as TProject, Project_RegionOfInterest, Project_ScreenRatio } from "./templates";
 
 export interface IProject {
@@ -52,6 +53,8 @@ export class Project implements Omit<IProject, 'rois'>{
     screenHeight: number = 0;
     rois: ROIs = new Map();
     dataURL: string = '';
+
+    public cameraType: CameraType = CameraType.CAMERA_ROI;
 
     private _image: HTMLImageElement | null = null;
     /**
@@ -230,10 +233,10 @@ export class Project implements Omit<IProject, 'rois'>{
         // console.log(roi);
         if (roi) {
             const safeArea = this.safeArea;
-            if (roi.x + roi.width + variation > safeArea.width) {
-                roi.width = safeArea.width - roi.x;
-            } else if (roi.width + variation < roi.rect.width) {
-                roi.width = roi.rect.width;
+            if (roi.bounds.right + variation > safeArea.right) {
+                roi.width = safeArea.width - roi.bounds.left;
+            } else if (roi.bounds.right + variation < roi.rect.bounds.right) {
+                roi.width = roi.rect.bounds.right;
             } else {
                 roi.width += variation;
             }
@@ -255,7 +258,7 @@ export class Project implements Omit<IProject, 'rois'>{
             const safeArea = this.safeArea;
             if (roi.y + roi.height + variation > safeArea.height) {
                 roi.height = safeArea.height - roi.y;
-            } else if (roi.height + variation < roi.rect.width) {
+            } else if (roi.y + roi.height + variation < roi.rect.width) {
                 roi.height = roi.rect.width;
             } else {
                 roi.height += variation;
@@ -346,6 +349,20 @@ export class Project implements Omit<IProject, 'rois'>{
         project.rois = new Map(json.rois.map((r: any) => [r.uuid, RegionOfInterest.fromJSON(project, r)]));
         console.log(project);
         return project;
+    }
+
+    /**
+     * 提取绘制用的数据
+     */
+    toDrawable(): DrawableProject {
+        return {
+            ratio: this.ratio,
+            screenWidth: this.screenWidth,
+            screenHeight: this.screenHeight,
+            rois: Array.from(this.rois.values()).map(r => r.toDrawable(r.uuid === this.selectedROI?.uuid)),
+            bounds: this.safeArea.toDrawable(),
+            cameraType: this.cameraType,
+        };
     }
 
 }

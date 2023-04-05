@@ -1,3 +1,4 @@
+import { DrawableBounds, DrawableRect, DrawableROI } from "./Drawable";
 import { Project } from "./Project";
 
 export interface IRect {
@@ -114,6 +115,21 @@ export class RegionOfInterest implements IRegionOfInterest {
     }
 
     /**
+     * 提取绘制用的数据
+     */
+    toDrawable(selected: boolean): DrawableROI {
+        return {
+            selected,
+            x: this.bounds.x,
+            y: this.bounds.y,
+            width: this.bounds.width,
+            height: this.bounds.height,
+            // bounds: this.bounds.toDrawable(),
+            rect: this.rect.toDrawable(),
+        }
+    }
+
+    /**
      * 将 ROI 转换为 JSON 对象
      * @returns JSON 对象
      */
@@ -167,6 +183,19 @@ export class Rect implements IRect {
         public width: number = 50,
         public height: number = 50
     ) { }
+
+    /**
+     * 提取绘制用的数据
+     */
+    toDrawable(): DrawableRect {
+        return {
+            x: this.bounds.x,
+            y: this.bounds.y,
+            width: this.bounds.width,
+            height: this.bounds.height,
+            // bounds: this.bounds.toDrawable(),
+        }
+    }
 
     /**
      * 将 Rect 转换为 JSON 对象
@@ -227,6 +256,18 @@ export class Bounds {
      * 下边界
      */
     get bottom() { return this.y + this.height; }
+
+    /**
+     * 提取绘制用的数据
+     */
+    toDrawable(): DrawableBounds {
+        return {
+            x: this.x,
+            y: this.y,
+            width: this.width,
+            height: this.height,
+        }
+    }
 
     /**
      * ROI 根据传入的 SafeArea 计算出新的边界

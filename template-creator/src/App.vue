@@ -13,6 +13,7 @@ import Preview from "@/components/sidebar/Preview.vue";
 import RatioSelector from "@/components/sidebar/RatioSelector.vue";
 import RectList from "@/components/sidebar/RectList.vue";
 import Toolbar from "@/components/sidebar/Toolbar.vue";
+import NewPanel from "./components/NewPanel.vue";
 import { CameraType } from "@/dtos/enums";
 import { Project } from "@/dtos/Project";
 import { selectFile } from "@/funcs/files";
@@ -76,6 +77,7 @@ function duplicateROI(uuid: string) {
  */
 function switchCamera() {
   camera.value = camera.value === CameraType.CAMERA_ROI ? CameraType.CAMERA_RECT : CameraType.CAMERA_ROI;
+  if (project.value) project.value.cameraType = camera.value;
 }
 
 async function createNewProject() {
@@ -85,6 +87,7 @@ async function createNewProject() {
   await newProject.loadScreenImage();
   newProject.filename = '*';
   project.value = newProject;
+  nextTick();
   setTitle(newProject.name);
 }
 
@@ -137,17 +140,12 @@ async function loadProject() {
 }
 
 async function openConfirm() {
-  // const result = await promptModal<boolean>(DialogConfirm)
-  // return result;
   const result = await modal.value?.openPrompt<boolean>(DialogConfirm);
   return result;
 }
 
 async function changeProjectName() {
   if (!project.value) return;
-  // const result = await promptModal<string | null>(ProjectNamePrompt);
-  // if (result === null) return;
-  // project.value.name = result;
   const result = await modal.value?.openPrompt<string>(ProjectNamePrompt);
   if (typeof result === 'string') {
     project.value.name = result;
@@ -229,7 +227,8 @@ onUnmounted(() => {
       </template>
     </Sidebar>
 
-    <Panel v-if="project"></Panel>
+    <!-- <Panel v-if="project" /> -->
+    <NewPanel v-if="project" />
   </div>
   <!-- <JenesiusModalContainer /> -->
   <Modal ref="modal" />

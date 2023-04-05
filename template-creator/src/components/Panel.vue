@@ -1,34 +1,41 @@
 <template>
     <div class="panel">
-        <canvas ref="rBgCanvasElement" width="100" height="100"></canvas>
+        <div class="background" ref="bgDiv"></div>
+        <!-- <canvas ref="rBgCanvasElement" width="100" height="100"></canvas> -->
         <canvas ref="rCanvasElement" width="100" height="100"></canvas>
     </div>
 </template>
 <script setup lang="ts">
+import { DrawableBounds, DrawableProject, DrawableROI } from "@/dtos/Drawable";
 import { CameraType } from "@/dtos/enums";
 import { Bounds, Rect } from "@/dtos/ROI";
 import { cameraTypeInjectKey, projectInjectKey } from "@/utils/injects";
 import { inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const project = inject(projectInjectKey);
-const camera  = inject(cameraTypeInjectKey);
+// const camera = inject(cameraTypeInjectKey);
 
-const rBgCanvasElement = ref<HTMLCanvasElement>();
+// const rBgCanvasElement = ref<HTMLCanvasElement>();
+const bgDiv = ref<HTMLDivElement>();
 const rCanvasElement = ref<HTMLCanvasElement>();
+
+const offscreenCanvas = new OffscreenCanvas(100, 100);
+const ctx = offscreenCanvas.getContext('2d')! as OffscreenCanvasRenderingContext2D;
 
 let mAnimationFrameId: number | null = null;
 let mCtx: CanvasRenderingContext2D | null = null;
+const a: DrawableProject[] = [];
 
 watch(() => project, (project) => {
     if (project) {
-        drawImageToCanvas();
+        initDrawable();
     }
 });
 
 onMounted(() => {
     mCtx = rCanvasElement.value!.getContext('2d')!;
-    mCtx.save();
-    drawImageToCanvas();
+    // ctx.save();
+    initDrawable();
     mAnimationFrameId = requestAnimationFrame(refreshCanvas);
 });
 
@@ -41,18 +48,43 @@ onBeforeUnmount(() => {
 async function drawImageToCanvas() {
     if (project?.value == null) return;
     const img = project.value.image!;
-    const bgCanvas = rBgCanvasElement.value;
+    // const bgCanvas = rBgCanvasElement.value;
     const canvas = rCanvasElement.value;
-    if (bgCanvas && canvas) {
-        // clear canvas
-        const ctx = bgCanvas.getContext('2d')!;
-        ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        const { width, height } = img;
-        bgCanvas.width = width;
-        bgCanvas.height = height;
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0);
+    // if (bgCanvas && canvas) {
+    //     // clear canvas
+    //     const ctx = bgCanvas.getContext('2d')!;
+    //     ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    //     const { width, height } = img;
+    //     bgCanvas.width = width;
+    //     bgCanvas.height = height;
+    //     canvas.width = width;
+    //     canvas.height = height;
+    //     ctx.drawImage(img, 0, 0);
+    // }
+}
+
+function initDrawable() {
+    if (project?.value) {
+        const { screenHeight: h, screenWidth: w } = project.value
+        if (rCanvasElement.value) {
+            rCanvasElement.value.width = w;
+            rCanvasElement.value.height = h;
+        }
+        if (offscreenCanvas) {
+            offscreenCanvas.width = w;
+            offscreenCanvas.height = h;
+        }
+        if (bgDiv.value) {
+            bgDiv.value.style.aspectRatio = `${w}/${h}`
+            if (w > h) {
+                bgDiv.value.style.width = '100%';
+                bgDiv.value.style.height = 'auto';
+            } else {
+                bgDiv.value.style.width = 'auto';
+                bgDiv.value.style.height = '100%';
+            }
+            bgDiv.value.style.backgroundImage = `url(${project.value.image?.src})`;
+        }
     }
 }
 
@@ -60,14 +92,19 @@ async function drawImageToCanvas() {
  * 刷新画布
  */
 function refreshCanvas() {
-    if (mCtx && project?.value?.image) {
+    if (!ctx || !mCtx || !project?.value) return;
+    if (ctx) {
         // mCtx.drawImage(props.project.image, 0, 0);
-        mCtx.clearRect(0, 0, project.value.image.width, project.value.image!.height);
-        drawSafeArea();
-        drawSelectedRoiBorder();
-        drawROIsRect();
+        ctx.clearRect(0, 0, project.value.screenWidth, project.value.screenHeight);
+        const drawable = project.value.toDrawable();
+        a[0] = drawable;
+        drawSafeArea(drawable.bounds);
+        drawROIsRect(drawable.rois);
+        mCtx.clearRect(0, 0, project.value.screenWidth, project.value.screenHeight);
+        mCtx.drawImage(offscreenCanvas, 0, 0);
+        delete a[0];
     }
-    requestAnimationFrame(refreshCanvas);
+    mAnimationFrameId = requestAnimationFrame(refreshCanvas);
 }
 
 let safeAreaDashOffset = 0;
@@ -75,18 +112,20 @@ let safeAreaDashOffset = 0;
 /**
  * 绘制安全区域，使用蚂蚁线
  */
-function drawSafeArea() {
-    if (mCtx && project?.value?.image) {
-        const { x, y, width: w, height: h } = project.value.safeArea;
-        mCtx.strokeStyle = 'green';
-        mCtx.lineWidth = 4;
-        mCtx.setLineDash([16, 16]);
-        mCtx.lineDashOffset = -safeAreaDashOffset;
-        mCtx.strokeRect(x, y, w, h);
+function drawSafeArea(area: DrawableBounds) {
+    if (ctx) {
+        const { x, y, width: w, height: h } = area;
+        ctx.save();
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 4;
+        ctx.setLineDash([16, 16]);
+        ctx.lineDashOffset = -safeAreaDashOffset;
+        ctx.strokeRect(x, y, w, h);
         safeAreaDashOffset += 1;
         if (safeAreaDashOffset > 32) {
             safeAreaDashOffset = 0;
         }
+        ctx.restore();
     }
 }
 
@@ -95,40 +134,38 @@ let selectedRectBorderDashOffset = 0;
 /**
  * 绘制 ROI 中的 Rect
  */
-function drawROIsRect() {
-    if (mCtx && project?.value?.image) {
-        const safeArea = project.value.safeArea;
+function drawROIsRect(rois: DrawableROI[]) {
+    if (ctx) {
+        // const safeArea = project.value.safeArea;
         // mCtx.save();
-        for (const roi of project.value.rois.values()) {
-            const rect = roi.rect;
-            const rectBounds = Bounds.fromRect(rect, roi, safeArea);
-            mCtx.lineWidth = 2;
-            mCtx.strokeStyle = 'blue';
-            mCtx.setLineDash([]);
-            mCtx.lineDashOffset = 0;
+        for (const roi of rois) {
+            ctx.save();
+            ctx.setLineDash([]);
+            ctx.lineDashOffset = 0;
             // 是否选中
-            const isSelected = roi.uuid === project.value.selectedRoiId;
-            if (isSelected) { // 选中的绘制红色边框
-                mCtx.lineWidth = 4;
-                mCtx.strokeStyle = 'red';
+            if (roi.selected) { // 选中的绘制红色边框
+                drawSelectedRoiBorder(roi);
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = 'red';
+            } else {
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'blue';
             }
-            // mCtx.strokeRect(roi.x + rect.x + safeArea.x, roi.y + rect.y + safeArea.y, rect.width, rect.height);
-            mCtx.strokeRect(rectBounds.x, rectBounds.y, rectBounds.width, rectBounds.height);
+            ctx.strokeRect(roi.rect.x, roi.rect.y, roi.rect.width, roi.rect.height);
             // 叠加虚线
-            mCtx.strokeStyle = 'white';
-            mCtx.setLineDash([5, 5]);
-            if (camera?.value === CameraType.CAMERA_RECT && isSelected) {
-                mCtx.lineDashOffset = -selectedRectBorderDashOffset;
+            ctx.strokeStyle = 'white';
+            ctx.setLineDash([5, 5]);
+            if (project?.value?.cameraType === CameraType.CAMERA_RECT && roi.selected) {
+                ctx.lineDashOffset = -selectedRectBorderDashOffset;
                 selectedRectBorderDashOffset++;
                 if (selectedRectBorderDashOffset > 20) {
                     selectedRectBorderDashOffset = 0;
                 }
             } else {
-                mCtx.lineDashOffset = 0;
+                ctx.lineDashOffset = 0;
             }
-            // mCtx.strokeRect(roi.x + rect.x + safeArea.x, roi.y + rect.y + safeArea.y, rect.width, rect.height);
-            mCtx.strokeRect(rectBounds.x, rectBounds.y, rectBounds.width, rectBounds.height);
-            // mCtx.restore();
+            ctx.strokeRect(roi.rect.x, roi.rect.y, roi.rect.width, roi.rect.height);
+            ctx.restore();
         }
     }
 }
@@ -138,27 +175,23 @@ let selectedRoiBorderDashOffset = 0;
 /**
  * 绘制选中的 ROI 边框，使用蚂蚁线
  */
-function drawSelectedRoiBorder() {
-    if (mCtx && project?.value?.image) {
-        const safeArea = project.value.safeArea;
-        const roi = project.value.selectedROI;
-        if (roi) {
-            const rect = roi.rect;
-            const roiBounds = Bounds.fromROI(roi, safeArea);
-            mCtx.strokeStyle = 'red';
-            mCtx.lineWidth = 2;
-            mCtx.setLineDash([6, 6]);
-            if (camera?.value === CameraType.CAMERA_ROI) {
-                mCtx.lineDashOffset = -selectedRoiBorderDashOffset;
-                selectedRoiBorderDashOffset++;
-                if (selectedRoiBorderDashOffset > 24) {
-                    selectedRoiBorderDashOffset = 0;
-                }
-            } else {
-                mCtx.lineDashOffset = 0;
+function drawSelectedRoiBorder(roi: DrawableROI) {
+    if (ctx) {
+        ctx.save();
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        if (project?.value?.cameraType === CameraType.CAMERA_ROI) {
+            ctx.lineDashOffset = -selectedRoiBorderDashOffset;
+            selectedRoiBorderDashOffset++;
+            if (selectedRoiBorderDashOffset > 24) {
+                selectedRoiBorderDashOffset = 0;
             }
-            mCtx.strokeRect(roiBounds.x, roiBounds.y, roiBounds.width, roiBounds.height);
+        } else {
+            ctx.lineDashOffset = 0;
         }
+        ctx.strokeRect(roi.x, roi.y, roi.width, roi.height);
+        ctx.restore();
     }
 }
 </script>
@@ -177,6 +210,16 @@ div.panel {
         max-width: 100%;
         max-height: 100%;
         background-color: transparent;
+    }
+
+    div.background {
+        position: absolute;
+        display: block;
+        flex: none;
+        max-width: 100%;
+        max-height: 100%;
+        background-color: transparent;
+        background-size: contain;
     }
 
     div.image {
