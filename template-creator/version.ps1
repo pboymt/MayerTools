@@ -19,7 +19,7 @@ $src_tauri_tauri_conf_json | Set-Content -Path src-tauri/tauri.conf.json
 
 # cd to src-tauri and update Cargo.lock
 Set-Location src-tauri
-cargo update
+cargo build
 
 # return to .
 Set-Location ..
