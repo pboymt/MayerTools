@@ -14,30 +14,30 @@
             <div class="attr-label">W</div>
             <div class="attr-label">H</div>
         </div>
-        <div class="attr-values">
+        <div class="attr-values" v-if="project?.selectedROI">
             <div class="attr-value">
-                {{ project?.selectedROI?.x }}
+                <input type="number" v-model="project.selectedROI.x" @keydown="$event.stopPropagation()">
             </div>
             <div class="attr-value">
-                {{ project?.selectedROI?.y }}
+                <input type="number" v-model="project.selectedROI.y" @keydown="$event.stopPropagation()">
             </div>
             <div class="attr-value">
-                {{ project?.selectedROI?.width }}
+                <input type="number" v-model="project.selectedROI.width" @keydown="$event.stopPropagation()">
             </div>
             <div class="attr-value">
-                {{ project?.selectedROI?.height }}
+                <input type="number" v-model="project.selectedROI.height" @keydown="$event.stopPropagation()">
             </div>
             <div class="attr-value">
-                {{ project?.selectedROI?.rect.x }}
+                <input type="number" v-model="project.selectedROI.rect.x" @keydown="$event.stopPropagation()">
             </div>
             <div class="attr-value">
-                {{ project?.selectedROI?.rect.y }}
+                <input type="number" v-model="project.selectedROI.rect.y" @keydown="$event.stopPropagation()">
             </div>
             <div class="attr-value">
-                {{ project?.selectedROI?.rect.width }}
+                <input type="number" v-model="project.selectedROI.rect.width" @keydown="$event.stopPropagation()">
             </div>
             <div class="attr-value">
-                {{ project?.selectedROI?.rect.height }}
+                <input type="number" v-model="project.selectedROI.rect.height" @keydown="$event.stopPropagation()">
             </div>
         </div>
     </div>
@@ -92,6 +92,7 @@ div.rect-info {
         display: flex;
         flex-direction: column;
         width: 1.5rem;
+        flex-shrink: 0;
 
         border: {
             right: {
@@ -117,18 +118,29 @@ div.rect-info {
     div.attr-values {
         display: flex;
         flex-direction: column;
-        flex-grow: 1;
+        // flex: 0 0 5rem;
+        overflow: hidden;
 
         div.attr-value {
             display: flex;
             align-items: center;
             justify-content: end;
-            flex-grow: 1;
             box-sizing: border-box;
-            padding-right: 1rem;
 
             &:nth-child(2n) {
                 background-color: rgba($color: #616161, $alpha: 0.5);
+            }
+
+            input {
+                display: block;
+                // flex: 1 1 auto;
+                width: 100%;
+                flex-shrink: 1;
+                line-height: 1.5rem;
+                text-align: right;
+                // height: 0.5rem;
+                padding: 0 0 0 0.25rem;
+                font-size: 1rem;
             }
         }
     }
