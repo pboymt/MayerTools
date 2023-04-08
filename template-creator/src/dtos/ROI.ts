@@ -40,21 +40,63 @@ export class RegionOfInterest implements IRegionOfInterest {
         return Bounds.fromROI(this, this.parent.safeArea);
     }
 
+    get x() { return this._x; }
+    get y() { return this._y; }
+    get width() { return this._width; }
+    get height() { return this._height; }
+
+    set x(value: number) {
+        if (value < 0) {
+            this._x = 0;
+        } else if (value + this.width > this.parent.safeArea.width) {
+            this._x = this.parent.safeArea.width - this.width;
+        } else {
+            this._x = value;
+        }
+    }
+    set y(value: number) {
+        if (value < 0) {
+            this._y = 0;
+        } else if (value + this.height > this.parent.safeArea.height) {
+            this._y = this.parent.safeArea.height - this.height;
+        } else {
+            this._y = value;
+        }
+    }
+    set width(value: number) {
+        if (value < this.rect.x + this.rect.width) {
+            this._width = this.rect.x + this.rect.width;
+        } else if (this.x + value > this.parent.safeArea.width) {
+            this._width = this.parent.safeArea.width - this.x;
+        } else {
+            this._width = value;
+        }
+    }
+    set height(value: number) {
+        if (value < this.rect.y + this.rect.height) {
+            this._height = this.rect.y + this.rect.height;
+        } else if (this.y + value > this.parent.safeArea.height) {
+            this._height = this.parent.safeArea.height - this.y;
+        } else {
+            this._height = value;
+        }
+    }
+
     constructor(
         public parent: Project,
         public uuid: string = crypto.randomUUID(),
         public name: string = uuid,
-        public x: number = 0,
-        public y: number = 0,
-        public width: number = 50,
-        public height: number = 50,
+        private _x: number = 0,
+        private _y: number = 0,
+        private _width: number = 50,
+        private _height: number = 50,
         public anchor: Anchor = Anchor.TOP_LEFT,
         rect?: Rect
     ) {
-        if (x < 0) this.x = 0;
-        if (y < 0) this.y = 0;
-        if (width < 1) this.width = 1;
-        if (height < 1) this.height = 1;
+        if (_x < 0) this._x = 0;
+        if (_y < 0) this._y = 0;
+        if (_width < 1) this._width = 1;
+        if (_height < 1) this._height = 1;
         this.rect = rect ?? new Rect(parent, this);
     }
 
@@ -169,20 +211,68 @@ export class RegionOfInterest implements IRegionOfInterest {
 }
 
 export class Rect implements IRect {
-    uuid = crypto.randomUUID();
+    uuid: string = crypto.randomUUID();
 
     get bounds() {
         return Bounds.fromRect(this, this.roi, this.proj.safeArea);
     }
 
+    get x() { return this._x; }
+    get y() { return this._y; }
+    get width() { return this._width; }
+    get height() { return this._height; }
+
+    set x(value: number) {
+        if (value < 0) {
+            this._x = 0;
+        } else if (value + this.width > this.roi.width) {
+            this._x = this.roi.width - this.width;
+        } else {
+            this._x = value;
+        }
+    }
+    set y(value: number) {
+        if (value < 0) {
+            this._y = 0;
+        } else if (value + this.height > this.roi.height) {
+            this._y = this.roi.height - this.height;
+        } else {
+            this._y = value;
+        }
+    }
+    set width(value: number) {
+        if (value < 1) {
+            this._width = 1;
+        } else if (this.x + value > this.roi.width) {
+            this._width = this.roi.width - this.x;
+        } else {
+            this._width = value;
+        }
+    }
+    set height(value: number) {
+        if (value < 1) {
+            this._height = 1;
+        } else if (this.y + value > this.roi.height) {
+            this._height = this.roi.height - this.y;
+        } else {
+            this._height = value;
+        }
+    }
+
+
     constructor(
         public proj: Project,
         public roi: RegionOfInterest,
-        public x: number = 0,
-        public y: number = 0,
-        public width: number = 50,
-        public height: number = 50
-    ) { }
+        public _x: number = 0,
+        public _y: number = 0,
+        public _width: number = 50,
+        public _height: number = 50
+    ) {
+        if (_x < 0) this._x = 0;
+        if (_y < 0) this._y = 0;
+        if (_width < 1) this._width = 1;
+        if (_height < 1) this._height = 1;
+    }
 
     /**
      * 提取绘制用的数据
@@ -267,6 +357,13 @@ export class Bounds {
             width: this.width,
             height: this.height,
         }
+    }
+
+    /**
+     * 检测输入的 x, y 是否在边界内
+     */
+    contains(x: number, y: number) {
+        return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
     }
 
     /**

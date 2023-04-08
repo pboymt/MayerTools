@@ -186,14 +186,7 @@ export class Project implements Omit<IProject, 'rois'>{
         const roi = this.selectedROI;
         // console.log(roi);
         if (roi) {
-            const safeArea = this.safeArea;
-            if (roi.x + offset < 0) {
-                roi.x = 0;
-            } else if (roi.x + roi.width + offset > safeArea.width) {
-                roi.x = safeArea.width - roi.width;
-            } else {
-                roi.x += offset;
-            }
+            roi.x += offset;
             nextTick();
         }
     }
@@ -209,14 +202,7 @@ export class Project implements Omit<IProject, 'rois'>{
         const roi = this.selectedROI;
         // console.log(roi);
         if (roi) {
-            const safeArea = this.safeArea;
-            if (roi.y + offset < 0) {
-                roi.y = 0;
-            } else if (roi.y + roi.height + offset > safeArea.height) {
-                roi.y = safeArea.height - roi.height;
-            } else {
-                roi.y += offset;
-            }
+            roi.y += offset;
             nextTick();
         }
     }
@@ -232,14 +218,7 @@ export class Project implements Omit<IProject, 'rois'>{
         const roi = this.selectedROI;
         // console.log(roi);
         if (roi) {
-            const safeArea = this.safeArea;
-            if (roi.bounds.right + variation > safeArea.right) {
-                roi.width = safeArea.width - roi.bounds.left;
-            } else if (roi.bounds.right + variation < roi.rect.bounds.right) {
-                roi.width = roi.rect.bounds.right;
-            } else {
-                roi.width += variation;
-            }
+            roi.width += variation;
             nextTick();
         }
     }
@@ -255,14 +234,7 @@ export class Project implements Omit<IProject, 'rois'>{
         const roi = this.selectedROI;
         // console.log(roi);
         if (roi) {
-            const safeArea = this.safeArea;
-            if (roi.y + roi.height + variation > safeArea.height) {
-                roi.height = safeArea.height - roi.y;
-            } else if (roi.y + roi.height + variation < roi.rect.width) {
-                roi.height = roi.rect.width;
-            } else {
-                roi.height += variation;
-            }
+            roi.height += variation;
             nextTick();
         }
     }
