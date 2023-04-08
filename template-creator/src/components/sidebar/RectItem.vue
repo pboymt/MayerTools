@@ -7,6 +7,11 @@
         </div>
         <div class="name" :title="roi.name">{{ roi.name }}</div>
         <div class="actions">
+            <div class="action" @click="switchAnchor" title="锚点">
+                <span class="svg" :class="computedAnchor">
+                    <!-- smartphone -->
+                </span>
+            </div>
             <div class="action" @click="rename" title="重命名">
                 <span class="material-symbols-outlined">
                     edit_square
@@ -31,7 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { Rect, RegionOfInterest } from '@/dtos/ROI';
+import { Anchor, Rect, RegionOfInterest } from '@/dtos/ROI';
+import { computed } from 'vue';
 
 interface Props {
     roi: RegionOfInterest;
@@ -40,6 +46,42 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits(['rename', 'duplicate', 'remove']);
+
+const computedAnchor = computed(() => {
+    const { anchor } = props.roi;
+    console.log(anchor.valueOf());
+    switch (anchor) {
+        case Anchor.BOTTOM_LEFT:
+            return 'anchor-bottom-left';
+        case Anchor.BOTTOM_RIGHT:
+            return 'anchor-bottom-right';
+        case Anchor.CENTER_BOTTOM:
+            return 'anchor-bottom-center';
+        case Anchor.TOP_LEFT:
+            return 'anchor-top-left';
+        case Anchor.TOP_RIGHT:
+            return 'anchor-top-right';
+        case Anchor.CENTER_TOP:
+            return 'anchor-top-center';
+        case Anchor.CENTER_LEFT:
+            return 'anchor-center-left';
+        case Anchor.CENTER_RIGHT:
+            return 'anchor-center-right';
+        case Anchor.CENTER:
+            return 'anchor-center-center';
+        default:
+            break;
+    }
+});
+
+function switchAnchor($event: MouseEvent) {
+    $event.stopPropagation();
+    if (props.roi.anchor >= 8) {
+        props.roi.anchor = 0;
+    } else {
+        props.roi.anchor += 1;
+    }
+}
 
 function rename($event: MouseEvent) {
     $event.stopPropagation();
@@ -124,7 +166,35 @@ div.rect-item {
 
             span {
                 font-size: 1rem;
+
+                &.svg {
+                    display: block;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    background-color: var(--foreground-color);
+
+                    // src\assets\anchor-top-left.svg
+                    @each $vertical in top,
+                    center,
+                    bottom {
+
+                        @each $horizontal in left,
+                        center,
+                        right {
+                            &.anchor-#{$vertical}-#{$horizontal} {
+                                mask: url('../../assets/anchor-#{$vertical}-#{$horizontal}.svg');
+                                -webkit-mask: url('../../assets/anchor-#{$vertical}-#{$horizontal}.svg');
+                                mask-position: center;
+                                -webkit-mask-position: center;
+                                mask-size: contain;
+                                -webkit-mask-size: contain;
+                            }
+                        }
+                    }
+                }
             }
+
+
         }
     }
 }
