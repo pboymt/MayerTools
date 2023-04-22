@@ -1,24 +1,8 @@
 import { DrawableProject } from "@/dtos/Drawable";
-import { writeBinaryFile, BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
+import { writeBinaryFile, BaseDirectory } from "@tauri-apps/api/fs";
+import { Template, Template_RegionOfInterest_Anchor, Template_ScreenRatio } from "@/dtos/export";
 
-export interface JSONMetadata {
-    version: number;
-    name: string;
-    width: number;
-    height: number;
-    screenRatio: number;
-    screenHeight: number;
-    screenWidth: number;
-    roi: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-        anchor: number;
-    }
-}
-
-export async function exportJSON(image: ImageBitmap, project: DrawableProject) {
+export async function exportMTTPL(image: ImageBitmap, project: DrawableProject) {
     for (const roi of project.rois) {
         const { x, y, width, height } = roi.rect;
         const tpl = document.createElement('canvas');
@@ -39,14 +23,14 @@ export async function exportJSON(image: ImageBitmap, project: DrawableProject) {
             });
         });
         // write binary file
-        const tplname = `${project.name}-${roi.name}.png`;
-        const jsonname = `${project.name}-${roi.name}.json`;
-        const metadata: JSONMetadata = {
+        const filename = `${project.name}-${roi.name}.mttpl`;
+        const proto = Template.toBinary({
             version: 1,
             name: project.name,
             width: width,
             height: height,
-            screenRatio: project.ratio,
+            image: uint8array,
+            screenRatio: project.ratio as unknown as Template_ScreenRatio,
             screenHeight: project.screenHeight,
             screenWidth: project.screenWidth,
             roi: {
@@ -54,12 +38,10 @@ export async function exportJSON(image: ImageBitmap, project: DrawableProject) {
                 y: roi.y,
                 width: roi.width,
                 height: roi.height,
-                anchor: roi.anchor,
+                anchor: roi.anchor as unknown as Template_RegionOfInterest_Anchor,
             }
-        }
-        await writeBinaryFile(tplname, uint8array, { dir: BaseDirectory.Download });
-        console.log(`exported ${tplname}`);
-        await writeTextFile(jsonname, JSON.stringify(metadata), { dir: BaseDirectory.Download });
-        console.log(`exported ${jsonname}`);
+        })
+        await writeBinaryFile(filename, proto, { dir: BaseDirectory.Download });
+        console.log(`exported ${filename}`);
     }
 }

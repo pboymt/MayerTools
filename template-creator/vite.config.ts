@@ -28,6 +28,7 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'index.html'),
         about: path.resolve(__dirname, 'about.html'),
+        export_image: path.resolve(__dirname, 'export-image.html'),
       }
     },
     // Tauri supports es2021

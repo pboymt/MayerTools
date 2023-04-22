@@ -21,6 +21,9 @@ import { setTitle } from "@/funcs/title";
 import { cameraTypeInjectKey, modalInjectKey, notificationsInjectKey, projectInjectKey } from "@/utils/injects";
 import Notifications from "./components/Notifications.vue";
 import { RegionOfInterest } from "./dtos/ROI";
+import { exportImage } from "./core/exports/image";
+import { exportMTTPL } from "./core/exports/mttpl";
+import { exportJSON } from "./core/exports/json";
 // import { config, container as JenesiusModalContainer, promptModal } from "jenesius-vue-modal";
 
 // config({
@@ -170,6 +173,26 @@ async function changeRoiName(uuid?: string) {
   }
 }
 
+async function exportTo(exType: string) {
+  if (project.value?.image) {
+    const bitmap = await createImageBitmap(project.value.image);
+    switch (exType) {
+      case 'fullmap':
+        exportImage(bitmap, project.value.toDrawable());
+        break;
+      case 'mttpl':
+        exportMTTPL(bitmap, project.value.toDrawable());
+        break;
+      case 'json':
+        exportJSON(bitmap, project.value.toDrawable());
+        break;
+      default:
+        alert('未知的导出类型');
+        break;
+    }
+  }
+}
+
 function showNotification() {
   console.log('showNotification');
   notifications.value?.addNotification('Hello World');
@@ -214,7 +237,7 @@ onUnmounted(() => {
     <Sidebar>
       <template #top>
         <Toolbar @add="addROI" @remove="removeROI" @clear="clearROIs" @switch="switchCamera" @rename="changeProjectName"
-          @roi-rename="changeRoiName" @project-export="showNotification" />
+          @roi-rename="changeRoiName" @project-export="exportTo" />
         <RectList :rois="project?.rois" :selected="project?.selectedRoiId"
           @select="($event: string) => project && (project.selectedRoiId = $event)" @rename="changeRoiName"
           @remove="removeROI" @duplicate="duplicateROI" />

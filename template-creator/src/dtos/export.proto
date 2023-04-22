@@ -1,0 +1,39 @@
+syntax = "proto3";
+package templates;
+
+message Template {
+    int32 version = 1;
+    string name = 2;
+    int32 width = 3;
+    int32 height = 4;
+    enum ScreenRatio {
+        RATIO_FULL = 0;
+        RATIO_1_2 = 1;
+        RATIO_3_4 = 2;
+        RATIO_9_16 = 3;
+    }
+    ScreenRatio screen_ratio = 5;
+    int32 screenWidth = 6;
+    int32 screenHeight = 7;
+
+    message RegionOfInterest {
+        int32 x = 1;
+        int32 y = 2;
+        int32 width = 3;
+        int32 height = 4;
+        enum Anchor {
+            CENTER = 0;
+            TOP_LEFT = 1;
+            TOP_RIGHT = 2;
+            BOTTOM_LEFT = 3;
+            BOTTOM_RIGHT = 4;
+            CENTER_LEFT = 5;
+            CENTER_RIGHT = 6;
+            CENTER_TOP = 7;
+            CENTER_BOTTOM = 8;
+        }
+        Anchor anchor = 5;
+    }
+    RegionOfInterest roi = 8;
+    bytes image = 9;
+}

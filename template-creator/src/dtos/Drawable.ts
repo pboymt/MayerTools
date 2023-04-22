@@ -1,6 +1,8 @@
+import { Anchor } from "./ROI";
 import { CameraType, ScreenRatio } from "./enums";
 
 interface DrawableProject {
+    name: string;
     ratio: ScreenRatio;
     screenWidth: number;
     screenHeight: number;
@@ -17,7 +19,9 @@ interface DrawableBounds {
 }
 
 interface DrawableROI {
+    name: string;
     selected: boolean;
+    anchor: Anchor;
     x: number;
     y: number;
     width: number;

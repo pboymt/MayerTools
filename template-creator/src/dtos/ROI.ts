@@ -161,11 +161,13 @@ export class RegionOfInterest implements IRegionOfInterest {
      */
     toDrawable(selected: boolean): DrawableROI {
         return {
+            name: this.name,
             selected,
             x: this.bounds.x,
             y: this.bounds.y,
             width: this.bounds.width,
             height: this.bounds.height,
+            anchor: this.anchor,
             // bounds: this.bounds.toDrawable(),
             rect: this.rect.toDrawable(),
         }

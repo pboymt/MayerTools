@@ -328,6 +328,7 @@ export class Project implements Omit<IProject, 'rois'>{
      */
     toDrawable(): DrawableProject {
         return {
+            name: this.name,
             ratio: this.ratio,
             screenWidth: this.screenWidth,
             screenHeight: this.screenHeight,
