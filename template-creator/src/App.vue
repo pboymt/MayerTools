@@ -181,10 +181,10 @@ async function exportTo(exType: string) {
         exportImage(bitmap, project.value.toDrawable());
         break;
       case 'mttpl':
-        exportMTTPL(bitmap, project.value.toDrawable());
+        exportMTTPL(bitmap, project.value);
         break;
       case 'json':
-        exportJSON(bitmap, project.value.toDrawable());
+        exportJSON(bitmap, project.value);
         break;
       default:
         alert('未知的导出类型');

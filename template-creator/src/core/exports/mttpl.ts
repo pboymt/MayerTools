@@ -1,10 +1,11 @@
 import { DrawableProject } from "@/dtos/Drawable";
 import { writeBinaryFile, BaseDirectory } from "@tauri-apps/api/fs";
 import { Template, Template_RegionOfInterest_Anchor, Template_ScreenRatio } from "@/dtos/export";
+import { IProject, Project } from "@/dtos/Project";
 
-export async function exportMTTPL(image: ImageBitmap, project: DrawableProject) {
-    for (const roi of project.rois) {
-        const { x, y, width, height } = roi.rect;
+export async function exportMTTPL(image: ImageBitmap, project: Project) {
+    for (const [uuid, roi] of project.rois) {
+        const { x, y, width, height } = roi.rect.bounds;
         const tpl = document.createElement('canvas');
         tpl.width = width;
         tpl.height = height;

@@ -1,4 +1,5 @@
 import { DrawableProject } from "@/dtos/Drawable";
+import { IProject, Project } from "@/dtos/Project";
 import { writeBinaryFile, BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
 
 export interface JSONMetadata {
@@ -18,9 +19,9 @@ export interface JSONMetadata {
     }
 }
 
-export async function exportJSON(image: ImageBitmap, project: DrawableProject) {
-    for (const roi of project.rois) {
-        const { x, y, width, height } = roi.rect;
+export async function exportJSON(image: ImageBitmap, project: Project) {
+    for (const [uuid, roi] of project.rois) {
+        const { x, y, width, height } = roi.rect.bounds;
         const tpl = document.createElement('canvas');
         tpl.width = width;
         tpl.height = height;
