@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ScreenRatio } from '@/dtos/enums';
+import { ScreenRatio } from '@/interfaces/enums';
 import { projectInjectKey } from '@/utils/injects';
 import { inject } from 'vue';
 

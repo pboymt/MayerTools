@@ -13,17 +13,17 @@ import Preview from "@/components/sidebar/Preview.vue";
 import RatioSelector from "@/components/sidebar/RatioSelector.vue";
 import RectList from "@/components/sidebar/RectList.vue";
 import Toolbar from "@/components/sidebar/Toolbar.vue";
-import NewPanel from "./components/NewPanel.vue";
-import { CameraType } from "@/dtos/enums";
-import { Project } from "@/dtos/Project";
+import NewPanel from "@/components/NewPanel.vue";
+import { CameraType } from "@/interfaces/enums";
+import { Project } from "@/interfaces/Project";
 import { selectFile } from "@/funcs/files";
 import { setTitle } from "@/funcs/title";
 import { cameraTypeInjectKey, modalInjectKey, notificationsInjectKey, projectInjectKey } from "@/utils/injects";
-import Notifications from "./components/Notifications.vue";
-import { RegionOfInterest } from "./dtos/ROI";
-import { exportImage } from "./core/exports/image";
-import { exportMTTPL } from "./core/exports/mttpl";
-import { exportJSON } from "./core/exports/json";
+import Notifications from "@/components/Notifications.vue";
+import { RegionOfInterest } from "@/interfaces/ROI";
+import { exportImage } from "@/core/exports/image";
+import { exportMTTPL } from "@/core/exports/mttpl";
+import { exportJSON } from "@/core/exports/json";
 // import { config, container as JenesiusModalContainer, promptModal } from "jenesius-vue-modal";
 
 // config({

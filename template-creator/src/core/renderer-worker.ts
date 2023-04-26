@@ -1,7 +1,7 @@
 // As a Web Worker
 
-import { DrawableBounds, DrawableProject, DrawableRect, DrawableROI } from "@/dtos/Drawable";
-import { CameraType } from "@/dtos/enums";
+import { DrawableBounds, DrawableProject, DrawableRect, DrawableROI } from "@/interfaces/Drawable";
+import { CameraType } from "@/interfaces/enums";
 
 interface IMessage {
     type: string;

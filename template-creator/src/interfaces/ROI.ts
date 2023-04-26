@@ -1,5 +1,5 @@
-import { DrawableBounds, DrawableRect, DrawableROI } from "./Drawable";
-import { Project } from "./Project";
+import { DrawableBounds, DrawableRect, DrawableROI } from "@/interfaces/Drawable";
+import { Project } from "@/interfaces/Project";
 
 export interface IRect {
     uuid: string;

@@ -1,5 +1,5 @@
-import { Anchor } from "./ROI";
-import { CameraType, ScreenRatio } from "./enums";
+import { Anchor } from "@/interfaces/ROI";
+import { CameraType, ScreenRatio } from "@/interfaces/enums";
 
 interface DrawableProject {
     name: string;

@@ -6,9 +6,9 @@
     </div>
 </template>
 <script setup lang="ts">
-import { DrawableBounds, DrawableProject, DrawableROI } from "@/dtos/Drawable";
-import { CameraType } from "@/dtos/enums";
-import { Bounds, Rect } from "@/dtos/ROI";
+import { DrawableBounds, DrawableProject, DrawableROI } from "@/interfaces/Drawable";
+import { CameraType } from "@/interfaces/enums";
+import { Bounds, Rect } from "@/interfaces/ROI";
 import { cameraTypeInjectKey, projectInjectKey } from "@/utils/injects";
 import { inject, onBeforeUnmount, onMounted, ref, watch } from "vue";
 

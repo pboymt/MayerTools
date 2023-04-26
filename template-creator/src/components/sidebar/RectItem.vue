@@ -36,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { Anchor, Rect, RegionOfInterest } from '@/dtos/ROI';
+import { Anchor, Rect, RegionOfInterest } from '@/interfaces/ROI';
 import { computed } from 'vue';
 
 interface Props {

@@ -57,10 +57,10 @@
 </template>
 
 <script setup lang="ts">
-import { CameraType } from '@/dtos/enums';
+import { CameraType } from '@/interfaces/enums';
 import { cameraTypeInjectKey, projectInjectKey } from '@/utils/injects';
 import { inject, onBeforeUnmount, onMounted } from 'vue';
-import ToolbarButton from './toolbar/ToolbarButton.vue';
+import ToolbarButton from '@/components/sidebar/toolbar/ToolbarButton.vue';
 
 
 const emit = defineEmits(['add', 'remove', 'clear', 'switch', 'rename', 'roi-rename', 'project-export',

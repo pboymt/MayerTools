@@ -1,7 +1,6 @@
-import { DrawableProject } from "@/dtos/Drawable";
-import { writeBinaryFile, BaseDirectory } from "@tauri-apps/api/fs";
 import { Template, Template_RegionOfInterest_Anchor, Template_ScreenRatio } from "@/dtos/export";
-import { IProject, Project } from "@/dtos/Project";
+import { Project } from "@/interfaces/Project";
+import { BaseDirectory, writeBinaryFile } from "@tauri-apps/api/fs";
 
 export async function exportMTTPL(image: ImageBitmap, project: Project) {
     for (const [uuid, roi] of project.rois) {

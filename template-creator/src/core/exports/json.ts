@@ -1,6 +1,5 @@
-import { DrawableProject } from "@/dtos/Drawable";
-import { IProject, Project } from "@/dtos/Project";
-import { writeBinaryFile, BaseDirectory, writeTextFile } from "@tauri-apps/api/fs";
+import { Project } from "@/interfaces/Project";
+import { BaseDirectory, writeBinaryFile, writeTextFile } from "@tauri-apps/api/fs";
 
 export interface JSONMetadata {
     version: number;

@@ -1,9 +1,9 @@
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { nextTick } from "vue";
-import { DrawableProject } from "./Drawable";
-import { CameraType, ScreenRatio } from "./enums";
-import { Bounds, IRegionOfInterest, RegionOfInterest, ROIs } from "./ROI";
-import { Project as TProject, Project_RegionOfInterest, Project_ScreenRatio } from "./templates";
+import { DrawableProject } from "@/interfaces/Drawable";
+import { CameraType, ScreenRatio } from "@/interfaces/enums";
+import { Bounds, IRegionOfInterest, RegionOfInterest, ROIs } from "@/interfaces/ROI";
+import { Project as TProject, Project_RegionOfInterest, Project_ScreenRatio } from "@/dtos/templates";
 
 export interface IProject {
     /**

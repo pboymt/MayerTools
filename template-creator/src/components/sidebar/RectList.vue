@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { Rect, ROIs } from '@/dtos/ROI';
 import { projectInjectKey } from '@/utils/injects';
 import { inject } from 'vue';
 import RectItem from './RectItem.vue';

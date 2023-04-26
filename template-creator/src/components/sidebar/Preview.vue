@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { Bounds } from "@/dtos/ROI";
+import { Bounds } from "@/interfaces/ROI";
 import { projectInjectKey } from "@/utils/injects";
 import { inject, onBeforeUnmount, onMounted, ref } from "vue";
 import RectInfo from "./preview/RectInfo.vue";

@@ -1,5 +1,5 @@
 import { WebviewWindow } from '@tauri-apps/api/window';
-import { DrawableProject } from '../../dtos/Drawable';
+import { DrawableProject } from '@/interfaces/Drawable';
 
 export function exportImage(image: ImageBitmap, drawable: DrawableProject) {
     const layer0 = document.createElement('canvas');
