@@ -5,7 +5,7 @@ export async function selectFile() {
         multiple: false,
         filters: [{
             name: 'Image',
-            extensions: ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp']
+            extensions: ['png', 'jpg', 'jpeg', 'bmp', 'webp']
         }]
     });
     if (typeof result === 'string' && result.length > 0) {
