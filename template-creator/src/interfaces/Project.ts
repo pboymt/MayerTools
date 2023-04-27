@@ -3,7 +3,7 @@ import { nextTick } from "vue";
 import { DrawableProject } from "@/interfaces/Drawable";
 import { CameraType, ScreenRatio } from "@/interfaces/enums";
 import { Bounds, IRegionOfInterest, RegionOfInterest, ROIs } from "@/interfaces/ROI";
-import { Project as TProject, Project_RegionOfInterest, Project_ScreenRatio } from "@/dtos/templates";
+import { Project as TProject, Project_RegionOfInterest, Project_ScreenRatio } from "@/dtos/project.v1";
 
 export interface IProject {
     /**

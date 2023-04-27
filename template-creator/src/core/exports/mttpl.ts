@@ -1,4 +1,4 @@
-import { Template, Template_RegionOfInterest_Anchor, Template_ScreenRatio } from "@/dtos/export";
+import { Template, Template_RegionOfInterest_Anchor, Template_ScreenRatio } from "@/dtos/export.v1";
 import { Project } from "@/interfaces/Project";
 import { BaseDirectory, writeBinaryFile } from "@tauri-apps/api/fs";
 

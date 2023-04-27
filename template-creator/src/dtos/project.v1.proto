@@ -1,5 +1,5 @@
 syntax = "proto3";
-package templates;
+package project.v1;
 
 message Project {
     string uuid = 1;

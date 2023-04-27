@@ -1,5 +1,5 @@
 syntax = "proto3";
-package templates;
+package export.v1;
 
 message Template {
     int32 version = 1;
