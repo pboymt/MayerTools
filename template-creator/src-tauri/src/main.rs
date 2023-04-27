@@ -18,7 +18,10 @@ fn main() {
         .menu(menu)
         .on_menu_event(move |event| match event.menu_item_id() {
             "app_quit" => {
-                std::process::exit(0);
+                event.window().app_handle().exit(0);
+            }
+            "app_restart" => {
+                event.window().app_handle().restart();
             }
             "window_close" => {
                 event.window().close().unwrap();

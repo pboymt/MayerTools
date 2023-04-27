@@ -23,6 +23,7 @@ pub fn create_menus() -> Menu {
     let menu_item_quit = MTCMenu::new("app_quit", "退出")
         .build()
         .accelerator("CmdOrCtrl+Q");
+    let menu_item_restart = MTCMenu::new("app_restart", "重启").build();
     let menu_item_project_new = MTCMenu::new("project_new", "新建项目")
         .build()
         .accelerator("CmdOrCtrl+N");
@@ -48,6 +49,7 @@ pub fn create_menus() -> Menu {
             .add_native_item(MenuItem::Separator)
             .add_item(menu_item_project_export)
             .add_native_item(MenuItem::Separator)
+            .add_item(menu_item_restart)
             .add_item(menu_item_quit),
     );
     // 子菜单 - 帮助
