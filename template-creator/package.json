@@ -8,7 +8,7 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "proto": "protoc --ts_out ./src/dtos --proto_path src/dtos templates.proto"
+    "proto": "protoc --ts_out ./src/dtos --proto_path src/dtos project.v1.proto project.v2.proto export.v1.proto"
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",

@@ -1,0 +1,55 @@
+syntax = "proto3";
+package project.v2;
+
+message Project {
+    string uuid = 1;
+    string name = 2;
+    enum ScreenRatio {
+        RATIO_FULL = 0;
+        RATIO_1_2 = 1;
+        RATIO_3_4 = 2;
+        RATIO_9_16 = 3;
+    }
+    ScreenRatio ratio = 3;
+    int32 screenWidth = 4;
+    int32 screenHeight = 5;
+    
+    message RegionOfInterest {
+        string uuid = 1;
+        string name = 2;
+        int32 x = 3;
+        int32 y = 4;
+        int32 width = 5;
+        int32 height = 6;
+        enum Anchor {
+            CENTER = 0;
+            TOP_LEFT = 1;
+            TOP_RIGHT = 2;
+            BOTTOM_LEFT = 3;
+            BOTTOM_RIGHT = 4;
+            CENTER_LEFT = 5;
+            CENTER_RIGHT = 6;
+            CENTER_TOP = 7;
+            CENTER_BOTTOM = 8;
+        }
+        Anchor anchor = 7;
+        message Rect {
+            string uuid = 1;
+            int32 x = 3;
+            int32 y = 4;
+            int32 width = 5;
+            int32 height = 6;
+        }
+        Rect rect = 8;
+        string namespace = 9;
+    }
+    repeated RegionOfInterest rois = 6;
+    string OBSOLETE_dataURL = 7;
+    int32 version = 8;
+    message Namespace {
+        string uuid = 1;
+        string name = 2;
+    }
+    repeated Namespace namespaces = 9;
+    bytes image = 10;
+}
